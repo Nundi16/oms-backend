@@ -64,5 +64,3 @@ elindultak (az első indulás a kickstart lefutása miatt eltarthat egy percig):
 
 > Az admin hitelesítő adatok a `docker/fusionauth.kickstart.json` fájlban vannak
 > definiálva (`initialAdminPassword`, illetve a regisztrált admin e-mail cím).
-> Éles környezetben ezeket az értékeket mindenképp módosítani kell.
-
