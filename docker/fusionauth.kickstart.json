@@ -1,0 +1,366 @@
+{
+  "apiKeys": [
+    {
+      "key": "xUDWvOb06NK6UhWyzKyc6VYWhvNOsEru3RErlMXLhrhdVwdIyZ0oeQNPoUt4oFqrM64krcUsTA9zRXwkSg1UEvLGFHdBWSsFAn3cwtAnUs7eEHWtrKLJ4fc2uRnjUsSn"
+    },
+    {
+      "key": "GnNJlajkFpTIstJnHjk4LdIhoQW9sdko1kvsGuwPcd3PDXeA40cvqEUiRihzn7GwxclebqhGyNUNiJfXaYQBT5Vcsp8sEfO9JYeaGwJE4FkiGA8LQOQ2nwV8zHLxLYn6"
+    }
+  ],
+  "variables": {
+    "defaultTenantId": "5d0336ae-bf06-447e-bfaf-4430701c0c6a",
+    "tenantManagerApplicationId": "90abafe3-538b-41ab-a730-9e21eb8f4d80",
+    "omsTenantId": "a1f99058-3650-456c-b620-00a797ddca5b",
+    "initialAdminPassword": "dZ0pRfcWXi2teWZTxsOWbNcHk9dbTuJu",
+    "testCustomerAppId": "c7b8e9f0-1234-5678-90ab-cdef12345678",
+    "testMobileAppId": "d4e5f6a7-2345-6789-0abc-def123456789",
+    "testTenantListAppId": "f1a2b3c4-3456-7890-abcd-ef1234567890",
+    "resetPasswordTemplateId": "b1a2c3d4-5678-9abc-def0-111111111111",
+    "setupPasswordTemplateId": "b1a2c3d4-5678-9abc-def0-222222222222",
+    "welcomeEmailTemplateId": "e3a1b2c4-5678-9abc-def0-123456789abc",
+    "testPcUserId": "c1a2b3c4-5678-9abc-def0-123456789abc",
+    "testMobileUserId": "c2b3c4d5-6789-abcd-ef01-23456789abcd"
+  },
+  "requests": [
+    {
+      "method": "POST",
+      "url": "/api/tenant/#{omsTenantId}",
+      "body": {
+        "tenant": {
+          "name": "OMS",
+          "issuer": "http://localhost:9011/"
+        }
+      }
+    },
+    {
+      "method": "PATCH",
+      "url": "/api/tenant/#{defaultTenantId}",
+      "body": {
+        "tenant": {
+          "issuer": "http://localhost:9011/"
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/email/template/#{resetPasswordTemplateId}",
+      "tenantId": "#{omsTenantId}",
+      "body": {
+        "emailTemplate": {
+          "name": "Reset Password",
+          "defaultSubject": "Leopoly OMS - Password Reset",
+          "defaultHtmlTemplate": "[#setting url_escaping_charset=\"UTF-8\"]\n<h1>Request to change your LeoShape OMS password.</h1>\n\n<p>You have requested to change your password.</p>\n\n<h2>If you did not make this request, please immediately contact our support team.</h2>\n\n<p>If you want to proceed with changing your password, please click on the link below:</p>\n\n<p>\n  <a href=\"${fusionauth_url}/password/change/${changePasswordId}?client_id=${(application.oauthConfiguration.clientId)!''}&tenantId=${user.tenantId}\">Reset your password</a>\n</p>\n\n- Leopoly\n",
+          "defaultTextTemplate": "[#setting url_escaping_charset=\"UTF-8\"]\nRequest to change your LeoShape OMS password.\n\nYou have requested to change your password. If you did not make this request, please immediately contact our support team.\n\nIf you want to proceed with changing your password, please click on the link below:\n\n${fusionauth_url}/password/change/${changePasswordId}?client_id=${(application.oauthConfiguration.clientId)!''}&tenantId=${user.tenantId}\n\n- Leopoly\n"
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/email/template/#{setupPasswordTemplateId}",
+      "tenantId": "#{omsTenantId}",
+      "body": {
+        "emailTemplate": {
+          "name": "Setup Password",
+          "defaultSubject": "Leopoly OMS - Finish Setting Up Your Account",
+          "defaultHtmlTemplate": "<h1>Your LeoShape OMS account has been created!</h1>\n\n<i>Please click the link below to set up your first password:</i>\n\n<p>\n  <a href=\"${fusionauth_url}/password/change/${changePasswordId}?client_id=${(application.oauthConfiguration.clientId)!''}&tenantId=${user.tenantId}\">\n    Setup your password\n  </a>\n</p>\n\n<i>You will soon receive information about getting started with LeoShape OMS.</i>\n\n- Leopoly\n",
+          "defaultTextTemplate": "Your LeoShape OMS account has been created!\n\nPlease click the link below to set up your first password:\n\n${fusionauth_url}/password/change/${changePasswordId}?client_id=${(application.oauthConfiguration.clientId)!''}&tenantId=${user.tenantId}\n\nYou will soon receive information about getting started with LeoShape OMS.\n\n- Leopoly\n"
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/email/template/#{welcomeEmailTemplateId}",
+      "tenantId": "#{omsTenantId}",
+      "body": {
+        "emailTemplate": {
+          "name": "Welcome to Application",
+          "defaultSubject": "Leopoly OMS - Welcome!",
+          "defaultHtmlTemplate": "<h1>Welcome to ${requestData.customerName}!</h1>\n\n<p>Your account has been added to <b>${requestData.customerName}</b>.</p>\n\n<p>You can now access the application at:</p>\n\n<p>\n  <a href=\"${requestData.applicationUrl}\">${requestData.applicationUrl}</a>\n</p>\n\n<p>If you have any questions, please contact your administrator.</p>\n\n- Leopoly\n",
+          "defaultTextTemplate": "Welcome to ${requestData.customerName}!\n\nYour account has been added to ${requestData.customerName}.\n\nYou can now access the application at:\n\n${requestData.applicationUrl}\n\nIf you have any questions, please contact your administrator.\n\n- Leopoly\n"
+        }
+      }
+    },
+    {
+      "method": "PATCH",
+      "url": "/api/tenant/#{omsTenantId}",
+      "body": {
+        "tenant": {
+          "emailConfiguration": {
+            "forgotPasswordEmailTemplateId": "#{resetPasswordTemplateId}",
+            "setPasswordEmailTemplateId": "#{setupPasswordTemplateId}",
+            "defaultFromEmail": "noreply@example.localhost",
+            "defaultFromName": "OMS"
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/user/registration",
+      "body": {
+        "skipVerification": true,
+        "user": {
+          "email": "admin@email.invalid",
+          "password": "#{initialAdminPassword}",
+          "fullName": "Admin User",
+          "data": {}
+        },
+        "registration": {
+          "applicationId": "#{FUSIONAUTH_APPLICATION_ID}",
+          "roles": [
+            "admin"
+          ]
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/application/#{testCustomerAppId}",
+      "tenantId": "#{omsTenantId}",
+      "body": {
+        "application": {
+          "name": "test-customer-web-login",
+          "roles": [
+            {
+              "name": "Admin"
+            },
+            {
+              "name": "Clinician"
+            },
+            {
+              "name": "Lab personnel"
+            },
+            {
+              "name": "Super admin"
+            },
+            {
+              "name": "System"
+            },
+            {
+              "name": "Clinic Admin"
+            }
+          ],
+          "oauthConfiguration": {
+            "proofKeyForCodeExchange": "Required",
+            "clientAuthenticationMethod": "None",
+            "clientAuthenticationPolicy": "NotRequired",
+            "authorizedURLValidationPolicy": "ExactMatch",
+            "proofKeyForCodeExchangePolicy": "Required",
+            "authorizedRedirectURLs": [
+              "http://localhost:4200/oidc/callback",
+              "http://example.localhost/oidc/callback",
+              "http://www.example.localhost/oidc/callback"
+            ],
+            "enabledGrants": [
+              "authorization_code",
+              "refresh_token"
+            ],
+            "generateRefreshTokens": true,
+            "unknownScopePolicy": "Allow"
+          },
+          "jwtConfiguration": {
+            "enabled": true,
+            "accessTokenKeyId": null,
+            "idTokenKeyId": null
+          },
+          "emailConfiguration": {
+            "setPasswordEmailTemplateId": "#{setupPasswordTemplateId}",
+            "forgotPasswordEmailTemplateId": "#{resetPasswordTemplateId}"
+          },
+          "data": {
+            "role": "web-login"
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/application/#{testMobileAppId}",
+      "tenantId": "#{omsTenantId}",
+      "body": {
+        "application": {
+          "name": "test-mobile-app",
+          "roles": [
+            {
+              "name": "Admin"
+            },
+            {
+              "name": "Clinician"
+            },
+            {
+              "name": "Lab personnel"
+            },
+            {
+              "name": "Super admin"
+            },
+            {
+              "name": "System"
+            },
+            {
+              "name": "Clinic Admin"
+            }
+          ],
+          "oauthConfiguration": {
+            "proofKeyForCodeExchange": "Required",
+            "clientAuthenticationMethod": "None",
+            "clientAuthenticationPolicy": "NotRequired",
+            "authorizedURLValidationPolicy": "ExactMatch",
+            "proofKeyForCodeExchangePolicy": "Required",
+            "authorizedRedirectURLs": [
+              "web+leopolyscanappexample://customer-tenant-callback",
+              "web+leopolyscanappexample://customer-tenant-logout-callback"
+            ],
+            "enabledGrants": [
+              "authorization_code",
+              "refresh_token"
+            ],
+            "generateRefreshTokens": true,
+            "unknownScopePolicy": "Allow"
+          },
+          "jwtConfiguration": {
+            "enabled": true,
+            "accessTokenKeyId": null,
+            "idTokenKeyId": null
+          },
+          "data": {
+            "role": "mobile-app",
+            "apiBaseUrl": "http://localhost:3000",
+            "displayName": "Local Dev Tenant"
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/application/#{testTenantListAppId}",
+      "tenantId": "#{omsTenantId}",
+      "body": {
+        "application": {
+          "name": "test-tenant-list-app",
+          "roles": [
+            {
+              "name": "User"
+            }
+          ],
+          "oauthConfiguration": {
+            "proofKeyForCodeExchange": "Required",
+            "clientAuthenticationMethod": "None",
+            "clientAuthenticationPolicy": "NotRequired",
+            "authorizedURLValidationPolicy": "ExactMatch",
+            "proofKeyForCodeExchangePolicy": "Required",
+            "authorizedRedirectURLs": [
+              "web+leopolyscanappexample://tenant-list-callback",
+              "web+leopolyscanappexample://tenant-list-logout-callback"
+            ],
+            "enabledGrants": [
+              "authorization_code",
+              "refresh_token"
+            ],
+            "generateRefreshTokens": true,
+            "unknownScopePolicy": "Allow"
+          },
+          "jwtConfiguration": {
+            "enabled": true,
+            "accessTokenKeyId": null,
+            "idTokenKeyId": null
+          },
+          "data": {
+            "role": "tenant-list-app"
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/user/registration/#{testPcUserId}",
+      "body": {
+        "skipVerification": true,
+        "user": {
+          "email": "john.doe@email.invalid",
+          "password": "Password1!",
+          "fullName": "John Doe",
+          "data": {}
+        },
+        "registration": {
+          "applicationId": "#{testCustomerAppId}",
+          "roles": [
+            "Super admin"
+          ]
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/user/registration/#{testMobileUserId}",
+      "body": {
+        "skipVerification": true,
+        "user": {
+          "email": "charlie.brown@email.invalid",
+          "password": "Password1!",
+          "fullName": "Charlie Brown",
+          "data": {}
+        },
+        "registration": {
+          "applicationId": "#{testCustomerAppId}",
+          "roles": [
+            "Super admin"
+          ]
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/user/registration/#{testMobileUserId}",
+      "body": {
+        "skipRegistrationVerification": true,
+        "registration": {
+          "applicationId": "#{testMobileAppId}",
+          "roles": [
+            "Super admin"
+          ]
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/user/registration/#{testMobileUserId}",
+      "body": {
+        "skipRegistrationVerification": true,
+        "registration": {
+          "applicationId": "#{testTenantListAppId}",
+          "roles": [
+            "User"
+          ]
+        }
+      }
+    },
+    {
+      "method": "PATCH",
+      "url": "/api/system-configuration",
+      "body": {
+        "systemConfiguration": {
+          "corsConfiguration": {
+            "allowedOrigins": [
+              "http://localhost:4200",
+              "http://localhost:4300",
+              "http://test.localhost:4200",
+              "http://test.localhost:4300",
+              "web+leopolyscanappexample://customer-tenant-callback",
+              "web+leopolyscanappexample://customer-tenant-logout-callback",
+              "web+leopolyscanappexample://tenant-list-callback",
+              "web+leopolyscanappexample://tenant-list-logout-callback"
+            ],
+            "allowCredentials": true,
+            "allowedMethods": [
+              "GET",
+              "POST",
+              "PUT",
+              "OPTIONS"
+            ],
+            "enabled": true
+          }
+        }
+      }
+    }
+  ]
+}

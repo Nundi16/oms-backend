@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: workflow-management-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: oms
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  authdb:
+    image: postgres:16-alpine
+    container_name: oms-authdb
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - authdb_data:/var/lib/postgresql/data
+    networks:
+      - app
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  fusionauth:
+    build:
+      context: .
+      dockerfile: ./docker/fusionauth.dockerfile
+    container_name: oms-fusionauth
+    restart: unless-stopped
+    ports:
+      - "9011:9011"
+    environment:
+      DATABASE_URL: jdbc:postgresql://authdb:5432/fusionauth
+      DATABASE_ROOT_USERNAME: postgres
+      DATABASE_ROOT_PASSWORD: postgres
+      DATABASE_USERNAME: auth
+      DATABASE_PASSWORD: auth
+      FUSIONAUTH_APP_KICKSTART_FILE: /usr/local/fusionauth/kickstart/kickstart.json
+      FUSIONAUTH_APP_RUNTIME_MODE: production
+    depends_on:
+      authdb:
+        condition: service_healthy
+    networks:
+      - app
+    volumes:
+      - fusionauth_config:/usr/local/fusionauth/config
+
+volumes:
+  postgres_data:
+  authdb_data:
+  fusionauth_config:
+
+networks:
+  app:
