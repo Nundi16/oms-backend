@@ -1,6 +1,6 @@
 ﻿namespace OMS.Common.Interfaces.Communication
 {
-    public interface IHandler { }
+    public interface IHandler;
     public interface IAuthorizedHandler
     {
         IResult Authorize();
@@ -11,11 +11,11 @@
         Task HandleAsync(TEvent @event, CancellationToken cancellationToken = default);
     }
 
-    public interface IAuthorizedEventHandler<in TEvent> : IAuthorizedHandler, IHandler where TEvent : class;
-    public interface IRequestHandler<in TEvent, TResponse> : IHandler where TEvent : class
+    public interface IAuthorizedEventHandler<TEvent> : IAuthorizedHandler, IHandler where TEvent : class;
+    public interface IRequestHandler<TEvent, TResponse> : IHandler where TEvent : class
     {
         Task<IResult<TResponse?>> HandleAsync(TEvent @event, CancellationToken cancellationToken = default);
     }
 
-    public interface IAuthorizedRequestHandler<in TEvent, TResponse> : IRequestHandler<TEvent, TResponse>, IAuthorizedEventHandler<TEvent> where TEvent : class;
+    public interface IAuthorizedRequestHandler<TEvent, TResponse> : IRequestHandler<TEvent, TResponse>, IAuthorizedEventHandler<TEvent> where TEvent : class;
 }

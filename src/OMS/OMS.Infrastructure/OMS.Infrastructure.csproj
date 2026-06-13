@@ -16,4 +16,8 @@
     <ProjectReference Include="..\OMS.Application\OMS.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Connectors\" />
+  </ItemGroup>
+
 </Project>

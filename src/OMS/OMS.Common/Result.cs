@@ -5,13 +5,16 @@ namespace OMS.Common
 {
     public class Result : IResult
     {
-        public bool Succeeded { get; private set; }
-        public string? ErrorMessage { get; private set; }
+        [MemberNotNullWhen(false, nameof(ErrorMessage))]
+        public bool Succeeded { get; private init; }
+        public string? ErrorMessage { get; private init; }
+
         private Result(bool isSuccess, string? errorMessage)
         {
             Succeeded = isSuccess;
             ErrorMessage = errorMessage;
         }
+
         public static Result Success() => new(true, null);
         public static Result Failure(string errorMessage) => new(false, errorMessage);
     }
@@ -19,9 +22,10 @@ namespace OMS.Common
     public class Result<T> : IResult<T>
     {
         [MemberNotNullWhen(true, nameof(Value))]
-        public bool Succeeded { get; private set; }
-        public T? Value { get; private set; }
-        public string? ErrorMessage { get; private set; }
+        [MemberNotNullWhen(false, nameof(ErrorMessage))]
+        public bool Succeeded { get; private init; }
+        public T? Value { get; private init; }
+        public string? ErrorMessage { get; private init; }
 
         private Result(bool isSuccess, T? value, string? errorMessage)
         {

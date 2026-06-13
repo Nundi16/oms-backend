@@ -1,6 +1,6 @@
 ﻿using OMS.Common.Interfaces;
 
-namespace OMS.Domain.Entities
+namespace OMS.Domain
 {
     public abstract class Entity : IDomainEntity
     {

@@ -25,7 +25,7 @@ namespace OMS.Application.Communications
             return Task.WhenAll(tasks);
         }
 
-        public Task<IResult<TResponse>> RequestAsync<TEvent, TResponse>(TEvent @event, CancellationToken cancellationToken = default)
+        public Task<IResult<TResponse?>> RequestAsync<TEvent, TResponse>(TEvent @event, CancellationToken cancellationToken = default)
             where TEvent : class
             where TResponse : class
         {
