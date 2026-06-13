@@ -4,7 +4,7 @@ using OMS.Common.Interfaces.Communication;
 
 namespace OMS.Application.Communications
 {
-    public class AuthorizingMediator(IServiceProvider serviceProvider, IMediatorAuthorizationGuard authorizationGuard) : IAuthorizingMediator
+    internal class AuthorizingMediator(IServiceProvider serviceProvider, IMediatorAuthorizationGuard authorizationGuard) : IAuthorizingMediator
     {
         public Task EmitAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
         {
