@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="OMS.Application/OMS.Application.csproj" />
+  <Project Path="OMS.Common/OMS.Common.csproj" />
+  <Project Path="OMS.Domain/OMS.Domain.csproj" />
+  <Project Path="OMS.Infrastructure/OMS.Infrastructure.csproj" />
+  <Project Path="OMS.Presentation/OMS.Presentation.csproj" />
+</Solution>
