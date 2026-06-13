@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using OMS.Infrastructure.Configuration;
+using OMS.Infrastructure.Abstractions.Configuration;
 
 namespace OMS.Infrastructure
 {

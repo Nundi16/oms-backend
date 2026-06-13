@@ -1,5 +1,5 @@
 ﻿using OMS.Domain.Modules;
-using OMS.Infrastructure.Configuration;
+using OMS.Infrastructure.Abstractions.Configuration;
 
 namespace OMS.Infrastructure.Modules.Configurations
 {

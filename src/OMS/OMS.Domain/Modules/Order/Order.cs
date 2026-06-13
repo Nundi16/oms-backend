@@ -1,4 +1,6 @@
-﻿namespace OMS.Domain.Modules
+﻿using OMS.Common.Abstractions.Entity;
+
+namespace OMS.Domain.Modules
 {
     public sealed class Order : Entity
     {

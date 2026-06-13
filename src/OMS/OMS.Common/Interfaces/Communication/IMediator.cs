@@ -8,6 +8,4 @@
             where TEvent : class
             where TResponse : class;
     }
-
-    public interface IAuthorizingMediator : IMediator;
 }

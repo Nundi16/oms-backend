@@ -1,20 +1,35 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using static OMS.Common.Constants.Infrastructure;
 
 namespace OMS.Infrastructure
 {
     public static class DependencyInjection
     {
-        public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            string _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            services.AddDatabase(configuration);
+            services.AddHealthChecks(configuration);
 
+            return services;
+        }
+
+        private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+        {
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
+                options.UseNpgsql(configuration.GetConnectionString(DEFAULT_CONNECTION))
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
-            services.AddHealthChecks().AddNpgSql(_connectionString, name: "PostgreSQL");
+            return services;
+        }
+
+        private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHealthChecks().AddNpgSql(configuration.GetConnectionString(DEFAULT_CONNECTION) 
+                ?? throw new InvalidOperationException($"Unable to resolve value for {DEFAULT_CONNECTION} from the configuration."));
+
+            return services;
         }
     }
 }

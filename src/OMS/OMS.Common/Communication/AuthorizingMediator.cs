@@ -1,10 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using OMS.Common.Interfaces;
 using OMS.Common.Interfaces.Communication;
+using OMS.Common.Interfaces.Communication.Authorization.Guards;
+using OMS.Common.Interfaces.Communication.Handlers.Event;
+using OMS.Common.Interfaces.Communication.Handlers.Request;
 
-namespace OMS.Application.Communications
+namespace OMS.Common.Communication
 {
-    internal class AuthorizingMediator(IServiceProvider serviceProvider, IMediatorAuthorizationGuard authorizationGuard) : IAuthorizingMediator
+    public class AuthorizingMediator(IServiceProvider serviceProvider, IMediatorAuthorizationGuard authorizationGuard) : IMediator
     {
         public Task EmitAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
         {
@@ -25,7 +28,7 @@ namespace OMS.Application.Communications
             return Task.WhenAll(tasks);
         }
 
-        public Task<IResult<TResponse?>> RequestAsync<TEvent, TResponse>(TEvent @event, CancellationToken cancellationToken = default)
+        public Task<IResult<TResponse>> RequestAsync<TEvent, TResponse>(TEvent @event, CancellationToken cancellationToken = default)
             where TEvent : class
             where TResponse : class
         {
@@ -33,7 +36,7 @@ namespace OMS.Application.Communications
 
             return authorizationGuard.Authorize<IRequestHandler<TEvent, TResponse>, TEvent>(handler).Succeeded
                 ? handler.HandleAsync(@event, cancellationToken)
-                : Task.FromResult<IResult<TResponse?>>(default);
+                : Task.FromResult<IResult<TResponse>>(Result.Failure<TResponse>(""));
         }
     }
 }

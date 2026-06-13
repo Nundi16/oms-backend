@@ -1,4 +1,6 @@
-﻿namespace OMS.Common.Interfaces.Communication
+﻿using OMS.Common.Interfaces.Communication.Handlers;
+
+namespace OMS.Common.Interfaces.Communication.Authorization.Guards
 {
     public interface IMediatorAuthorizationGuard
     {

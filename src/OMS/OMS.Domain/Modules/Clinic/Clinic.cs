@@ -1,6 +1,8 @@
-﻿namespace OMS.Domain.Modules
+﻿using OMS.Common.Abstractions.Entity;
+
+namespace OMS.Domain.Modules
 {
-    public class Clinic : Entity
+    public sealed class Clinic : Entity
     {
         public string Name { get; set; }
     }
