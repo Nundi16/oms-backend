@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OMS.Infrastructure.Audit;
+using OMS.Infrastructure.Options;
 using static OMS.Common.Constants.Infrastructure;
 
 namespace OMS.Infrastructure
@@ -11,15 +14,32 @@ namespace OMS.Infrastructure
         {
             services.AddDatabase(configuration);
             services.AddHealthChecks(configuration);
+            services.AddOptions();
 
             return services;
         }
 
         private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString(DEFAULT_CONNECTION))
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+            services.AddDbContext<ApplicationDbContext>((provider, options) =>
+            {
+                options.UseNpgsql(configuration.GetConnectionString(DEFAULT_CONNECTION));
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                options.AddInterceptors(provider.GetServices<IInterceptor>());
+            });
+
+            return services;
+        }
+
+        private static IServiceCollection AddOptions(this IServiceCollection services)
+        {
+            services.Configure<EntityStateActionOptions>(options =>
+            {
+                options.RegisterAction(EntityState.Added, ShadowPropertySetter.SetCreationProperties);
+                options.RegisterAction(EntityState.Modified, ShadowPropertySetter.SetModificationProperties);
+                options.RegisterAction(EntityState.Deleted, ShadowPropertySetter.SetDeletionProperties);
+                options.Complete();
+            });
 
             return services;
         }

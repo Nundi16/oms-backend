@@ -15,8 +15,8 @@ namespace OMS.Infrastructure.Abstractions.Configuration
                 entity => !EF.Property<DateTime?>(entity, ShadowProperties.DELETED_AT).HasValue
                 );
             builder.Property<byte[]>(ShadowProperties.ROW_VERSION).IsRowVersion();
-            builder.Property<Guid>(ShadowProperties.CREATOR).IsRequired();
-            builder.Property<Guid?>(ShadowProperties.MODIFIER).IsRequired(false);
+            builder.Property<Guid>(ShadowProperties.CREATOR_ID).IsRequired();
+            builder.Property<Guid?>(ShadowProperties.MODIFIER_ID).IsRequired(false);
             builder.Property<DateTime?>(ShadowProperties.CREATED_AT).IsRequired(false);
             builder.Property<DateTime?>(ShadowProperties.MODIFIED_AT).IsRequired(false);
             builder.Property<DateTime?>(ShadowProperties.DELETED_AT).IsRequired(false);
