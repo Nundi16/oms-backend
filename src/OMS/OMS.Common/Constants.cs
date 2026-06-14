@@ -5,7 +5,7 @@
         public static class Infrastructure
         {
             public const string LOGICAL_DELETION_FILTER_KEY = "LogicalDeletionQueryFilter";
-            public const string DEFAULT_CONNECTION = "DefaultConnections";
+            public const string DEFAULT_CONNECTION = "DefaultConnection";
 
             public static class ShadowProperties
             {

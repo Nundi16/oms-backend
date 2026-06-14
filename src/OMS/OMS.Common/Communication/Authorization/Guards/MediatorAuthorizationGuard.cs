@@ -4,7 +4,7 @@ using OMS.Common.Interfaces.Communication.Handlers;
 
 namespace OMS.Common.Communication.Authorization.Guards
 {
-    internal class MediatorAuthorizationGuard : IMediatorAuthorizationGuard
+    public class MediatorAuthorizationGuard : IMediatorAuthorizationGuard
     {
         public IResult Authorize<TEventHandler, TEvent>(TEventHandler handler)
             where TEventHandler : IHandler
