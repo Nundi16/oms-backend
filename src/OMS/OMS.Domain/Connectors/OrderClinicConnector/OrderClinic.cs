@@ -1,5 +1,7 @@
-﻿using OMS.Domain.Modules;
-namespace OMS.Domain.Connectors
+﻿using OMS.Domain.Modules.ClinicModule;
+using OMS.Domain.Modules.OrderModule;
+
+namespace OMS.Domain.Connectors.OrderClinicConnector
 {
     public sealed class OrderClinic : Connector<Order, Clinic>
     {

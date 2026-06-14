@@ -1,8 +1,8 @@
 ﻿using OMS.Common.Abstractions.Entity;
 
-namespace OMS.Domain.Modules
+namespace OMS.Domain.Modules.OrderModule
 {
-    public sealed class Clinic : Entity
+    public sealed class Order : Entity
     {
         public string Name { get; set; }
     }

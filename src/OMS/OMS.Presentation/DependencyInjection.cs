@@ -2,9 +2,11 @@
 {
     public static class DependencyInjection
     {
-        public static void AddPresentation(this IServiceCollection services)
+        public static IServiceCollection AddPresentation(this IServiceCollection services)
         {
             // Register presentation services here
+
+            return services;
         }
     }
 }

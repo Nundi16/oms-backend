@@ -14,4 +14,10 @@
     <ProjectReference Include="..\OMS.Domain\OMS.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Connectors\OrderClinic\" />
+    <Folder Include="Models\" />
+    <Folder Include="Modules\ClinicModule\" />
+  </ItemGroup>
+
 </Project>

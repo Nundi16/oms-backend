@@ -3,8 +3,8 @@ using OMS.Domain.Interfaces.Events;
 
 namespace OMS.Domain.Abstractions.Events
 {
-    public abstract record CreationDomainEvent<TEntity> 
-        : DomainEvent<TEntity>,
+    public record CreationDomainEvent<TEntity>(TEntity Entity)
+        : DomainEvent<TEntity>(Entity),
         ICreationDomainEvent<TEntity>
         where TEntity : Entity;
 }
