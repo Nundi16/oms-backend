@@ -2,7 +2,7 @@
 
 namespace OMS.Presentation.Controllers.OrderModule.Contracts
 {
-    public class CreateOrderRequest
+    public record CreateOrderRequest
     {
         public required CreateOrderRequestDto Order { get; init; }
     }

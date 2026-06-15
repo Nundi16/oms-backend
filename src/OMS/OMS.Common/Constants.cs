@@ -10,8 +10,8 @@
             public static class ShadowProperties
             {
                 public const string ROW_VERSION = "RowVersion";
-                public const string CREATOR = "Creator";
-                public const string MODIFIER = "Modifier";
+                public const string CREATOR_ID = "CreatorId";
+                public const string MODIFIER_ID = "ModifierId";
                 public const string CREATED_AT = "CreatedAt";
                 public const string MODIFIED_AT = "ModifiedAt";
                 public const string DELETED_AT = "DeletedAt";

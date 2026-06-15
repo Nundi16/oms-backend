@@ -3,11 +3,11 @@ using OMS.Infrastructure.Abstractions.Configuration;
 
 namespace OMS.Infrastructure
 {
-    internal class ApplicationDbContext : DbContext
+    internal sealed class ApplicationDbContext(DbContextOptions options) : DbContext(options)
     {
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            builder.ApplyConfigurationsFromAssembly(typeof(EntityConfiguration<>).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(EntityConfiguration<>).Assembly);
         }
     }
 }
