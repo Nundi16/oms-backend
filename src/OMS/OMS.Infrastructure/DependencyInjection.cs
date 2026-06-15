@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OMS.Infrastructure.Audit;
+using OMS.Infrastructure.Interceptors;
 using OMS.Infrastructure.Options;
 using static OMS.Common.Constants.Infrastructure;
 
@@ -21,6 +22,7 @@ namespace OMS.Infrastructure
 
         private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddScoped<ISaveChangesInterceptor, AuditSaveChangesInterceptor>();
             services.AddDbContext<ApplicationDbContext>((provider, options) =>
             {
                 options.UseNpgsql(configuration.GetConnectionString(DEFAULT_CONNECTION));
