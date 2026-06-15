@@ -1,39 +1,48 @@
-using OMS.Infrastructure;
 using OMS.Application;
+using OMS.Infrastructure;
+using OMS.Presentation;
+using Scalar.AspNetCore;
 
-namespace OMS.Presentation
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddPresentation();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddPresentation();
+
+builder.Services.AddRouting(options =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+    options.LowercaseUrls = true;
+});
 
-            // Add services to the container.
-            builder.Services.AddPresentation();
-            builder.Services.AddApplication();
-            builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddValidation();
+builder.Services.AddProblemDetails();
 
-            builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+builder.Services.AddRateLimiter();
+builder.Services.AddRequestTimeouts();
+//builder.Services.AddExceptionHandler<>();
+//builder.Services.AddResponseCaching();
 
-            var app = builder.Build();
+builder.Services.AddControllers();
+builder.Services.AddOpenApi();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.MapOpenApi();
-            }
+var app = builder.Build();
 
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-
-            app.MapControllers();
-
-            app.Run();
-        }
-    }
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
 }
+
+app.UseHttpsRedirection();
+app.UseHealthChecks("/health");
+app.UseAuthorization();
+app.UseRateLimiter();
+app.UseRequestTimeouts();
+app.MapControllers();
+//app.UseResponseCaching();
+//app.UseExceptionHandler();
+app.MapScalarApiReference();
+
+app.Run();

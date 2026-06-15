@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OMS.Common.Interfaces;
 using OMS.Infrastructure.Audit;
+using OMS.Infrastructure.Authorization;
 using OMS.Infrastructure.Interceptors;
 using OMS.Infrastructure.Options;
 using static OMS.Common.Constants.Infrastructure;
@@ -16,6 +18,8 @@ namespace OMS.Infrastructure
             services.AddDatabase(configuration);
             services.AddHealthChecks(configuration);
             services.AddOptions();
+            services.AddInternalAuthorization();
+            services.AddSingleton(TimeProvider.System);
 
             return services;
         }
@@ -37,9 +41,9 @@ namespace OMS.Infrastructure
         {
             services.Configure<EntityStateActionOptions>(options =>
             {
-                options.RegisterAction(EntityState.Added, ShadowPropertySetter.SetCreationProperties);
-                options.RegisterAction(EntityState.Modified, ShadowPropertySetter.SetModificationProperties);
-                options.RegisterAction(EntityState.Deleted, ShadowPropertySetter.SetDeletionProperties);
+                options.RegisterAction(EntityState.Added, ShadowPropertySetters.Creation.Set);
+                options.RegisterAction(EntityState.Modified, ShadowPropertySetters.Modification.Set);
+                options.RegisterAction(EntityState.Deleted, ShadowPropertySetters.Deletion.Set);
                 options.Complete();
             });
 
@@ -50,6 +54,13 @@ namespace OMS.Infrastructure
         {
             services.AddHealthChecks().AddNpgSql(configuration.GetConnectionString(DEFAULT_CONNECTION) 
                 ?? throw new InvalidOperationException($"Unable to resolve value for {DEFAULT_CONNECTION} from the configuration."));
+
+            return services;
+        }
+
+        private static IServiceCollection AddInternalAuthorization(this IServiceCollection services)
+        {
+            services.AddScoped<IUserContext, UserContext>();
 
             return services;
         }
