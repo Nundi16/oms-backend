@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: workflow-management-postgres
+    container_name: oms-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
@@ -23,7 +23,7 @@ services:
 
   authdb:
     image: postgres:16-alpine
-    container_name: oms-authdb
+    container_name: oms-auth-db
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
@@ -43,7 +43,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/fusionauth.dockerfile
-    container_name: oms-fusionauth
+    container_name: oms-fusion-auth
     restart: unless-stopped
     ports:
       - "9011:9011"
