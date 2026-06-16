@@ -8,7 +8,7 @@ using OMS.Infrastructure.Interfaces.Communication.Handlers;
 
 namespace OMS.Infrastructure.Communication
 {
-    internal sealed class InfrastructureMediator(IServiceProvider serviceProvider, IMediatorAuthorizationGuard authorizationGuard)
+    internal sealed class InfrastructureMediator(IServiceProvider serviceProvider, IMediatorAuthorizationGuard authorizationGuard) 
         : AuthorizingMediator(serviceProvider, authorizationGuard),
         IInfrastructureMediator
     {
@@ -16,7 +16,7 @@ namespace OMS.Infrastructure.Communication
             where TDomainEvent : ICreationDomainEvent<TEntity>
             where TEntity : Entity
         {
-            var handler = serviceProvider.GetRequiredService<ICreationDomainEventHandler>();
+            var handler = ServiceProvider.GetRequiredService<ICreationDomainEventHandler>();
 
             var result = await handler.HandleAsync<TDomainEvent, TEntity>(@event.Entity, cancellationToken);
 
@@ -27,7 +27,7 @@ namespace OMS.Infrastructure.Communication
             where TDomainEvent : IDeletionDomainEvent<TEntity>
             where TEntity : Entity
         {
-            var handler = serviceProvider.GetRequiredService<IDeletionDomainEventHandler>();
+            var handler = ServiceProvider.GetRequiredService<IDeletionDomainEventHandler>();
 
             var result = handler.Handle<TDomainEvent, TEntity>(@event.Entity);
 
@@ -38,7 +38,7 @@ namespace OMS.Infrastructure.Communication
             where TDomainEvent : IModificationDomainEvent<TEntity>
             where TEntity : Entity
         {
-            var handler = serviceProvider.GetRequiredService<IModificationEventHandler>();
+            var handler = ServiceProvider.GetRequiredService<IModificationEventHandler>();
 
             var result = handler.Handle<TDomainEvent, TEntity>(@event.Entity);
 

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OMS.Common.Communication;
 using OMS.Common.Interfaces;
 using OMS.Infrastructure.Audit;
 using OMS.Infrastructure.Authorization;
@@ -20,6 +21,7 @@ namespace OMS.Infrastructure
             services.AddOptions();
             services.AddInternalAuthorization();
             services.AddSingleton(TimeProvider.System);
+            services.RegisterHandlersFromCurrentAssembly();
 
             return services;
         }

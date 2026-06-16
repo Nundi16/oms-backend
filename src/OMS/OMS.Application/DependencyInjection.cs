@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using OMS.Common.Communication;
 
 namespace OMS.Application
 {
@@ -6,7 +7,7 @@ namespace OMS.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            // Register application services here
+            services.RegisterHandlersFromCurrentAssembly();
 
             return services;
         }

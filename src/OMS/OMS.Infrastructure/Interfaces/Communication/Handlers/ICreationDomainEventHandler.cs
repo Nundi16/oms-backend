@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using OMS.Common.Abstractions.Entity;
+using OMS.Common.Interfaces.Communication.Handlers;
 using OMS.Domain.Interfaces.Events;
 
 namespace OMS.Infrastructure.Interfaces.Communication.Handlers
 {
-    internal interface ICreationDomainEventHandler
+    internal interface ICreationDomainEventHandler : IHandler
     {
         Task<EntityEntry<TEntity>> HandleAsync<TDomainEvent, TEntity>(TEntity entity, CancellationToken cancellationToken = default)
             where TDomainEvent : ICreationDomainEvent<TEntity>

@@ -9,19 +9,22 @@ namespace OMS.Common.Communication
 {
     public class AuthorizingMediator(IServiceProvider serviceProvider, IMediatorAuthorizationGuard authorizationGuard) : IMediator
     {
+        protected readonly IServiceProvider ServiceProvider = serviceProvider;
+        protected readonly IMediatorAuthorizationGuard AuthorizationGuard = authorizationGuard;
+
         public Task EmitAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
         {
-            var handler = serviceProvider.GetRequiredService<IEventHandler<TEvent>>();
+            var handler = ServiceProvider.GetRequiredService<IEventHandler<TEvent>>();
 
-            return authorizationGuard.Authorize<IEventHandler<TEvent>, TEvent>(handler).Succeeded
+            return AuthorizationGuard.Authorize<IEventHandler<TEvent>, TEvent>(handler).Succeeded
                 ? handler.HandleAsync(@event, cancellationToken)
                 : Task.CompletedTask;
         }
 
         public Task FanOutAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
         {
-            var handlers = serviceProvider.GetServices<IEventHandler<TEvent>>()
-                .Where(handler => authorizationGuard.Authorize<IEventHandler<TEvent>, TEvent>(handler).Succeeded);
+            var handlers = ServiceProvider.GetServices<IEventHandler<TEvent>>()
+                .Where(handler => AuthorizationGuard.Authorize<IEventHandler<TEvent>, TEvent>(handler).Succeeded);
 
             var tasks = handlers.Select(handler => handler.HandleAsync(@event, cancellationToken)).ToArray();
 
@@ -32,9 +35,9 @@ namespace OMS.Common.Communication
             where TEvent : class
             where TResponse : class
         {
-            var handler = serviceProvider.GetRequiredService<IRequestHandler<TEvent, TResponse>>();
+            var handler = ServiceProvider.GetRequiredService<IRequestHandler<TEvent, TResponse>>();
 
-            return authorizationGuard.Authorize<IRequestHandler<TEvent, TResponse>, TEvent>(handler).Succeeded
+            return AuthorizationGuard.Authorize<IRequestHandler<TEvent, TResponse>, TEvent>(handler).Succeeded
                 ? handler.HandleAsync(@event, cancellationToken)
                 : Task.FromResult<IResult<TResponse>>(Result.Failure<TResponse>(""));
         }
