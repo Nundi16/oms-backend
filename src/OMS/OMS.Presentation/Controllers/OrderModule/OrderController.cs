@@ -10,9 +10,9 @@ namespace OMS.Presentation.Controllers.OrderModule
     public sealed class OrderController(IMediator mediator) : ControllerBase
     {
         [HttpPost]
-        public async Task<IActionResult> Create(CreateOrderRequest request, CancellationToken cancellationToken = default) 
+        public async Task<IActionResult> Create(CreateOrderApiRequest request, CancellationToken cancellationToken = default) 
         {
-            var result = await mediator.RequestAsync<CreateOrderRequestDto, CreateOrderResponseDto>(request.Order, cancellationToken);
+            var result = await mediator.RequestAsync<CreateOrderRequest, CreateOrderResponse>(request.Order, cancellationToken);
             return Ok(result);
         }
     }

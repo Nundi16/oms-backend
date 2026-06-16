@@ -2,8 +2,8 @@
 
 namespace OMS.Presentation.Controllers.OrderModule.Contracts
 {
-    public record CreateOrderRequest
+    public record CreateOrderApiRequest
     {
-        public required CreateOrderRequestDto Order { get; init; }
+        public required CreateOrderRequest Order { get; init; }
     }
 }

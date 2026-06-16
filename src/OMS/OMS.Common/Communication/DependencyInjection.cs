@@ -1,6 +1,9 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using OMS.Common.Communication.Authorization.Guards;
+using OMS.Common.Interfaces.Communication;
+using OMS.Common.Interfaces.Communication.Authorization.Guards;
 using OMS.Common.Interfaces.Communication.Handlers;
 using OMS.Common.Interfaces.Communication.Handlers.Event;
 using OMS.Common.Interfaces.Communication.Handlers.Request;
@@ -9,6 +12,14 @@ namespace OMS.Common.Communication
 {
     public static class DependencyInjection
     {
+        public static IServiceCollection AddMediator(this IServiceCollection services)
+        {
+            services.AddSingleton<IMediator, AuthorizingMediator>();
+            services.AddSingleton<IMediatorAuthorizationGuard, MediatorAuthorizationGuard>();
+
+            return services;
+        }
+
         public static IServiceCollection RegisterHandlersFromCurrentAssembly(this IServiceCollection services)
         {
             var assembly = Assembly.GetCallingAssembly();

@@ -8,14 +8,14 @@ using OMS.Domain.Modules.OrderModule;
 
 namespace OMS.Application.Modules.OrderModule
 {
-    internal class OrderCreationRequestHandler(IInfrastructureMediator mediator) : IRequestHandler<CreateOrderRequestDto, CreateOrderResponseDto>
+    internal class OrderCreationRequestHandler(IInfrastructureMediator mediator) : IRequestHandler<CreateOrderRequest, CreateOrderResponse>
     {
-        public async Task<IResult<CreateOrderResponseDto>> HandleAsync(CreateOrderRequestDto @event, CancellationToken cancellationToken = default)
+        public async Task<IResult<CreateOrderResponse>> HandleAsync(CreateOrderRequest @event, CancellationToken cancellationToken = default)
         {
             var entity = new Order { Name = @event.Name };
             var order = await mediator.HandleCreationAsync<OrderCreationEvent, Order>(new OrderCreationEvent(entity), cancellationToken);
 
-            return Result.Success(new CreateOrderResponseDto(order.Id, order.Name));
+            return Result.Success(new CreateOrderResponse(order.Id, order.Name));
         }
     }
 }
