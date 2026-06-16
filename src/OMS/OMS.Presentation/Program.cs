@@ -1,6 +1,8 @@
 using OMS.Application;
+using OMS.Application.Connectors;
 using OMS.Infrastructure;
 using OMS.Presentation;
+using OMS.Presentation.Serialization;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,7 +26,9 @@ builder.Services.AddRequestTimeouts();
 //builder.Services.AddExceptionHandler<>();
 //builder.Services.AddResponseCaching();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(option => 
+    PolymorphicJsonOption.GetOptions(typeof(BaseConnectorDto)));
+
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
