@@ -6,7 +6,7 @@ using OMS.Infrastructure.Interfaces.Communication.Handlers;
 
 namespace OMS.Infrastructure.Communication.Handlers
 {
-    internal sealed class DeletionEventHandler(DbContext context) : IDeletionDomainEventHandler
+    internal sealed class DeletionEventHandler(ApplicationDbContext context) : IDeletionDomainEventHandler
     {
         public EntityEntry<TEntity> Handle<TDomainEvent, TEntity>(TEntity entity)
             where TDomainEvent : IDeletionDomainEvent<TEntity>

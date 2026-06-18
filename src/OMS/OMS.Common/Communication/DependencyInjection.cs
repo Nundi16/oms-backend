@@ -14,8 +14,8 @@ namespace OMS.Common.Communication
     {
         public static IServiceCollection AddMediator(this IServiceCollection services)
         {
-            services.AddSingleton<IMediator, AuthorizingMediator>();
-            services.AddSingleton<IMediatorAuthorizationGuard, MediatorAuthorizationGuard>();
+            services.AddScoped<IMediator, AuthorizingMediator>();
+            services.AddScoped<IMediatorAuthorizationGuard, MediatorAuthorizationGuard>();
 
             return services;
         }
@@ -50,7 +50,10 @@ namespace OMS.Common.Communication
                     : ServiceLifetime.Transient;
 
         private static IEnumerable<TypeInfo> GetHandlerImplementationTypesFromAssembly(Assembly assembly) =>
-            assembly.DefinedTypes.Where(type => type is { IsAbstract: false, IsInterface: false } && typeof(IHandler).IsAssignableFrom(type));
+            assembly.DefinedTypes.Where(type =>
+                type is { IsAbstract: false, IsInterface: false } &&
+                !type.ContainsGenericParameters &&
+                typeof(IHandler).IsAssignableFrom(type));
 
         private static IEnumerable<Type> GetUnderlyingInterfacesForHandler(TypeInfo typeInfo) =>
             typeInfo.GetInterfaces().Where(type => type.IsGenericType && type.Implements(typeof(IRequestHandler<,>), typeof(IEventHandler<>)));

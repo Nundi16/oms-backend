@@ -2,12 +2,17 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OMS.Application.Communication.Requests;
+using OMS.Application.Communication.Responses;
 using OMS.Common.Communication;
 using OMS.Common.Interfaces;
+using OMS.Common.Interfaces.Communication.Handlers.Request;
 using OMS.Infrastructure.Audit;
 using OMS.Infrastructure.Authorization;
 using OMS.Infrastructure.Communication;
+using OMS.Infrastructure.Communication.Handlers;
 using OMS.Infrastructure.Interceptors;
+using OMS.Infrastructure.Interfaces.Communication.Handlers;
 using OMS.Infrastructure.Options;
 using static OMS.Common.Constants.Infrastructure;
 
@@ -22,6 +27,14 @@ namespace OMS.Infrastructure
             services.AddOptions();
             services.AddInternalAuthorization();
             services.AddSingleton(TimeProvider.System);
+
+            // Register generic CRUD handlers first as fallback
+            services.RegisterGenericHandlers();
+
+            // Register infrastructure-level domain event handlers used by InfrastructureMediator
+            services.RegisterInfrastructureDomainEventHandlers();
+
+            // Then register specific handlers from this assembly
             services.RegisterHandlersFromCurrentAssembly();
 
             services.AddMediator();
@@ -60,6 +73,66 @@ namespace OMS.Infrastructure
         {
             services.AddHealthChecks().AddNpgSql(configuration.GetConnectionString(DEFAULT_CONNECTION) 
                 ?? throw new InvalidOperationException($"Unable to resolve value for {DEFAULT_CONNECTION} from the configuration."));
+
+            return services;
+        }
+
+        private static IServiceCollection RegisterGenericHandlers(this IServiceCollection services)
+        {
+            // Find all entity types in the Domain assembly that inherit from Entity
+            var domainAssemblyTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => a.GetName().Name?.StartsWith("OMS.Domain") == true)
+                .SelectMany(a => a.GetTypes());
+
+            var entityTypes = domainAssemblyTypes
+                .Where(t => !t.IsAbstract && t.IsClass && typeof(OMS.Common.Abstractions.Entity.Entity).IsAssignableFrom(t))
+                .ToList();
+
+            foreach (var entityType in entityTypes)
+            {
+                // Register CreateEntityRequestHandler<TEntity>
+                var createRequestType = typeof(CreateEntityRequest<>).MakeGenericType(entityType);
+                var createResponseType = typeof(EntityResponse<>).MakeGenericType(entityType);
+                var createHandlerInterface = typeof(IRequestHandler<,>).MakeGenericType(createRequestType, createResponseType);
+                var createHandlerImplementation = typeof(CreateEntityRequestHandler<>).MakeGenericType(entityType);
+                services.AddScoped(createHandlerInterface, createHandlerImplementation);
+
+                // Register UpdateEntityRequestHandler<TEntity>
+                var updateRequestType = typeof(UpdateEntityRequest<>).MakeGenericType(entityType);
+                var updateResponseType = typeof(EntityResponse<>).MakeGenericType(entityType);
+                var updateHandlerInterface = typeof(IRequestHandler<,>).MakeGenericType(updateRequestType, updateResponseType);
+                var updateHandlerImplementation = typeof(UpdateEntityRequestHandler<>).MakeGenericType(entityType);
+                services.AddScoped(updateHandlerInterface, updateHandlerImplementation);
+
+                // Register DeleteEntityRequestHandler<TEntity>
+                var deleteRequestType = typeof(DeleteEntityRequest<>).MakeGenericType(entityType);
+                var deleteHandlerInterface = typeof(IRequestHandler<,>).MakeGenericType(deleteRequestType, typeof(DeleteEntityResponse));
+                var deleteHandlerImplementation = typeof(DeleteEntityRequestHandler<>).MakeGenericType(entityType);
+                services.AddScoped(deleteHandlerInterface, deleteHandlerImplementation);
+
+                // Register GetEntityRequestHandler<TEntity>
+                var getRequestType = typeof(GetEntityRequest<>).MakeGenericType(entityType);
+                var getResponseType = typeof(EntityResponse<>).MakeGenericType(entityType);
+                var getHandlerInterface = typeof(IRequestHandler<,>).MakeGenericType(getRequestType, getResponseType);
+                var getHandlerImplementation = typeof(GetEntityRequestHandler<>).MakeGenericType(entityType);
+                services.AddScoped(getHandlerInterface, getHandlerImplementation);
+
+                // Register GetEntitiesRequestHandler<TEntity>
+                var getListRequestType = typeof(GetEntitiesRequest<>).MakeGenericType(entityType);
+                var getListResponseType = typeof(EntityListResponse<>).MakeGenericType(entityType);
+                var getListHandlerInterface = typeof(IRequestHandler<,>).MakeGenericType(getListRequestType, getListResponseType);
+                var getListHandlerImplementation = typeof(GetEntitiesRequestHandler<>).MakeGenericType(entityType);
+                services.AddScoped(getListHandlerInterface, getListHandlerImplementation);
+            }
+
+            return services;
+        }
+
+        private static IServiceCollection RegisterInfrastructureDomainEventHandlers(this IServiceCollection services)
+        {
+            services.AddScoped<ICreationDomainEventHandler, CreationEventHandler>();
+            services.AddScoped<IDeletionDomainEventHandler, DeletionEventHandler>();
+            services.AddScoped<IModificationEventHandler, ModificationEventHandler>();
 
             return services;
         }

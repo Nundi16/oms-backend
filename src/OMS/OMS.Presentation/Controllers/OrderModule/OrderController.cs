@@ -1,19 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OMS.Application.Modules.OrderModule.Models;
-using OMS.Common.Interfaces.Communication;
-using OMS.Presentation.Controllers.OrderModule.Contracts;
 
 namespace OMS.Presentation.Controllers.OrderModule
 {
-    [ApiController]
     [Route("api/[controller]")]
-    public sealed class OrderController(IMediator mediator) : ControllerBase
+    public sealed class OrderController : BaseCrudController<OrderDto>
     {
-        [HttpPost]
-        public async Task<IActionResult> Create(CreateOrderApiRequest request, CancellationToken cancellationToken = default) 
+        public OrderController(OMS.Common.Interfaces.Communication.IMediator mediator) : base(mediator)
         {
-            var result = await mediator.RequestAsync<CreateOrderRequest, CreateOrderResponse>(request.Order, cancellationToken);
-            return Ok(result);
         }
     }
 }

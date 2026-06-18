@@ -6,7 +6,7 @@ using OMS.Infrastructure.Interfaces.Communication.Handlers;
 
 namespace OMS.Infrastructure.Communication.Handlers
 {
-    internal sealed class ModificationEventHandler(DbContext context) : IModificationEventHandler
+    internal sealed class ModificationEventHandler(ApplicationDbContext context) : IModificationEventHandler
     {
         public EntityEntry<TEntity> Handle<TDomainEvent, TEntity>(TEntity entity)
             where TDomainEvent : IModificationDomainEvent<TEntity>

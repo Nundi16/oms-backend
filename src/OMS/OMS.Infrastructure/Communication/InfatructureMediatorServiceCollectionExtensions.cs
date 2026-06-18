@@ -7,7 +7,7 @@ namespace OMS.Infrastructure.Communication
     {
         public static IServiceCollection AddInfrastructureMediator(this IServiceCollection services)
         {
-            services.AddSingleton<IInfrastructureMediator, InfrastructureMediator>();
+            services.AddScoped<IInfrastructureMediator, InfrastructureMediator>();
 
             return services;
         }

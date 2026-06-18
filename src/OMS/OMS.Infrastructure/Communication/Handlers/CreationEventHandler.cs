@@ -6,7 +6,7 @@ using OMS.Infrastructure.Interfaces.Communication.Handlers;
 
 namespace OMS.Infrastructure.Communication.Handlers
 {
-    internal sealed class CreationEventHandler(DbContext context) : ICreationDomainEventHandler
+    internal sealed class CreationEventHandler(ApplicationDbContext context) : ICreationDomainEventHandler
     {
         public Task<EntityEntry<TEntity>> HandleAsync<TDomainEvent, TEntity>(TEntity entity, CancellationToken cancellationToken = default)
             where TDomainEvent : ICreationDomainEvent<TEntity>
