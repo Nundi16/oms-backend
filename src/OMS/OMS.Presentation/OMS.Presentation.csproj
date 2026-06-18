@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>bb22212c-247c-4811-956b-2d2dad896633</UserSecretsId>
+    <!-- TODO: Transitive AutoMapper 12.0.1 has a known vulnerability (NU1903). Remove this suppression once we migrate off the 12.x line. -->
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

@@ -4,6 +4,22 @@ namespace OMS.Domain.Modules.OrderModule
 {
     public sealed class Order : Entity
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
+
+        // Dynamic dropdown value (runtime-managed catalog) - stored as code/key
+        public string? Status { get; set; }
+
+        public DateTime? DeliveryDate { get; set; }
+
+        public string? DeliveryLocation { get; set; }
+
+        public string? Notes { get; set; }
+
+        // Dynamic dropdown value (runtime-managed catalog) - stored as code/key
+        public string? Product { get; set; }
+
+        public DateTime? ScannedAt { get; set; }
+
+        public string? PatientNo { get; set; }
     }
 }

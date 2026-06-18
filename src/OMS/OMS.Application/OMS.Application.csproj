@@ -4,6 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!-- TODO: AutoMapper 12.0.1 has a known vulnerability (NU1903). Remove this suppression once we migrate off the 12.x line. -->
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +20,6 @@
   <ItemGroup>
     <Folder Include="Connectors\OrderClinic\" />
     <Folder Include="Models\" />
-    <Folder Include="Modules\ClinicModule\" />
     <Folder Include="Modules\OrderModule\Events\" />
   </ItemGroup>
 
