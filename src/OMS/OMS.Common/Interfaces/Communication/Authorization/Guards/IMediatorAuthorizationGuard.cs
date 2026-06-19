@@ -7,5 +7,8 @@ namespace OMS.Common.Interfaces.Communication.Authorization.Guards
         IResult Authorize<TEventHandler, TEvent>(TEventHandler handler)
             where TEventHandler : IHandler
             where TEvent : class;
+
+        IResult Authorize<TEventHandler>(TEventHandler handler)
+            where TEventHandler : IHandler;
     }
 }

@@ -2,13 +2,13 @@ using OMS.Application;
 using OMS.Application.Connectors;
 using OMS.Infrastructure;
 using OMS.Presentation;
-using OMS.Presentation.Serialization;
+using OMS.Presentation.Extensions;
+using OMS.Presentation.Middleware;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddPresentation();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPresentation();
@@ -16,18 +16,20 @@ builder.Services.AddPresentation();
 builder.Services.AddRouting(options =>
 {
     options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = true;
 });
 
 builder.Services.AddValidation();
 builder.Services.AddProblemDetails();
-
 builder.Services.AddRateLimiter();
 builder.Services.AddRequestTimeouts();
-//builder.Services.AddExceptionHandler<>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 //builder.Services.AddResponseCaching();
 
-builder.Services.AddControllers().AddJsonOptions(option => 
-    PolymorphicJsonOption.GetOptions(typeof(BaseConnectorDto)));
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.WithPolymorhicModifiersOf<ConnectorBase>();
+});
 
 builder.Services.AddOpenApi();
 
@@ -46,7 +48,7 @@ app.UseRateLimiter();
 app.UseRequestTimeouts();
 app.MapControllers();
 //app.UseResponseCaching();
-//app.UseExceptionHandler();
+app.UseExceptionHandler();
 app.MapScalarApiReference();
 
 app.Run();

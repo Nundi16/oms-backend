@@ -10,9 +10,9 @@ namespace OMS.Application.Modules.OrderModule
 {
     internal class OrderCreationRequestHandler(IInfrastructureMediator mediator) : IRequestHandler<CreateOrderRequest, CreateOrderResponse>
     {
-        public async Task<IResult<CreateOrderResponse>> HandleAsync(CreateOrderRequest @event, CancellationToken cancellationToken = default)
+        public async Task<IResult<CreateOrderResponse>> HandleAsync(CreateOrderRequest request, CancellationToken cancellationToken = default)
         {
-            var entity = new Order { Name = @event.Name };
+            var entity = new Order { Name = request.Name };
             var order = await mediator.HandleCreationAsync<OrderCreationEvent, Order>(new OrderCreationEvent(entity), cancellationToken);
 
             return Result.Success(new CreateOrderResponse(order.Id, order.Name));

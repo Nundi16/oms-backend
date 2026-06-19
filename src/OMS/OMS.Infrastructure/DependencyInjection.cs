@@ -2,11 +2,13 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using OMS.Common.Communication;
 using OMS.Common.Interfaces;
 using OMS.Infrastructure.Audit;
 using OMS.Infrastructure.Authorization;
 using OMS.Infrastructure.Communication;
+using OMS.Infrastructure.Filters.Helpers;
 using OMS.Infrastructure.Interceptors;
 using OMS.Infrastructure.Options;
 using static OMS.Common.Constants.Infrastructure;
@@ -52,6 +54,13 @@ namespace OMS.Infrastructure
                 options.RegisterAction(EntityState.Deleted, ShadowPropertySetters.Deletion.Set);
                 options.Complete();
             });
+
+            var filterOptions = Microsoft.Extensions.Options.Options.Create(new FilterOptions
+            {
+                All = FilterOptionsHelper.GetFilterOptionsFromCurrentAssembly()
+            });
+
+            services.AddSingleton(filterOptions);
 
             return services;
         }

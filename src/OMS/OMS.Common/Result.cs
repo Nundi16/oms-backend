@@ -16,9 +16,9 @@ namespace OMS.Common
         }
 
         public static Result Success() => new(true);
-        public static Result<TValue> Success<TValue>(TValue value) where TValue : notnull => Result<TValue>.Success(value);
+        public static IResult<TValue> Success<TValue>(TValue value) where TValue : notnull => Result<TValue>.Success(value);
         public static Result Failure(string message) => new(false, message);
-        public static Result<TValue> Failure<TValue>(string message) where TValue : notnull => Result<TValue>.Failure(message);
+        public static IResult<TValue> Failure<TValue>(string message) where TValue : notnull => Result<TValue>.Failure(message);
     }
 
     public class Result<TValue> : IResult<TValue>
