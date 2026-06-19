@@ -2,17 +2,21 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OMS.Application.Communication.Queries;
 using OMS.Application.Communication.Requests;
 using OMS.Application.Communication.Responses;
+using OMS.Application.Connectors.Abstractions;
 using OMS.Common.Communication;
 using OMS.Common.Interfaces;
 using OMS.Common.Interfaces.Communication.Handlers.Request;
+using OMS.Domain.Modules.OrderModule;
 using OMS.Infrastructure.Audit;
 using OMS.Infrastructure.Authorization;
 using OMS.Infrastructure.Communication;
 using OMS.Infrastructure.Communication.Handlers;
 using OMS.Infrastructure.Interceptors;
 using OMS.Infrastructure.Interfaces.Communication.Handlers;
+using OMS.Infrastructure.Modules.OrderClinicConnector;
 using OMS.Infrastructure.Options;
 using static OMS.Common.Constants.Infrastructure;
 
@@ -33,6 +37,9 @@ namespace OMS.Infrastructure
 
             // Register infrastructure-level domain event handlers used by InfrastructureMediator
             services.RegisterInfrastructureDomainEventHandlers();
+
+            // Register connector pipeline implementations
+            services.RegisterConnectorPipeline();
 
             // Then register specific handlers from this assembly
             services.RegisterHandlersFromCurrentAssembly();
@@ -140,6 +147,19 @@ namespace OMS.Infrastructure
         private static IServiceCollection AddInternalAuthorization(this IServiceCollection services)
         {
             services.AddScoped<IUserContext, UserContext>();
+            services.AddScoped<OMS.Application.Interfaces.Authorization.ICurrentClinicProvider, StaticCurrentClinicProvider>();
+
+            return services;
+        }
+
+        private static IServiceCollection RegisterConnectorPipeline(this IServiceCollection services)
+        {
+            // OrderClinic connector components — Infrastructure-level since they depend on EF + DbContext
+            services.AddScoped<IConnectorReader<Order>, OrderClinicReader>();
+            services.AddScoped<IConnectorWriter<Order>, OrderClinicWriter>();
+            services.AddScoped<IEntityQueryFilter<Order>, OrderClinicCurrentClinicFilter>();
+
+            // Future connectors register here following the same pattern.
 
             return services;
         }

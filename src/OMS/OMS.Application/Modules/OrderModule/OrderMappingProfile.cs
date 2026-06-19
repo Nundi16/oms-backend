@@ -8,8 +8,11 @@ namespace OMS.Application.Modules.OrderModule
 	{
 		public OrderMappingProfile()
 		{
-			CreateMap<OrderDto, Order>();
-			CreateMap<Order, OrderDto>();
+			CreateMap<OrderDto, Order>()
+				.ForMember(dest => dest.Id, opt => opt.Ignore()); // Id is managed by Entity base
+
+			CreateMap<Order, OrderDto>()
+				.ForMember(dest => dest.Connectors, opt => opt.Ignore()); // Connectors filled by reader pipeline
 		}
 	}
 }

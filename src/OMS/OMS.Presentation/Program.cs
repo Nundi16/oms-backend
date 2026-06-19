@@ -26,8 +26,8 @@ builder.Services.AddRequestTimeouts();
 //builder.Services.AddExceptionHandler<>();
 //builder.Services.AddResponseCaching();
 
-builder.Services.AddControllers().AddJsonOptions(option => 
-    PolymorphicJsonOption.GetOptions(typeof(BaseConnectorDto)));
+builder.Services.AddControllers().AddJsonOptions(option =>
+    PolymorphicJsonOption.Configure(option.JsonSerializerOptions, typeof(BaseConnectorDto)));
 
 builder.Services.AddOpenApi();
 

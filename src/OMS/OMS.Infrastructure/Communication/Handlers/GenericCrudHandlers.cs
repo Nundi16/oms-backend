@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using OMS.Application.Communication.Queries;
 using OMS.Application.Communication.Requests;
 using OMS.Application.Communication.Responses;
 using OMS.Application.Interfaces.Communication;
@@ -124,11 +125,13 @@ namespace OMS.Infrastructure.Communication.Handlers
 	}
 
 	/// <summary>
-	/// Generic handler for getting a single entity by ID
-	/// This handler will be used unless a more specific implementation exists
+	/// Generic handler for getting a single entity by ID.
+	/// Now integrates IEntityQueryFilter for deferred cross-cutting query constraints.
 	/// </summary>
 	/// <typeparam name="TEntity">The entity type to retrieve</typeparam>
-	internal class GetEntityRequestHandler<TEntity>(ApplicationDbContext dbContext) 
+	internal class GetEntityRequestHandler<TEntity>(
+		ApplicationDbContext dbContext,
+		IEnumerable<IEntityQueryFilter<TEntity>> queryFilters) 
 		: IScopedHandler, IRequestHandler<GetEntityRequest<TEntity>, EntityResponse<TEntity>>
 		where TEntity : Entity
 	{
@@ -136,12 +139,20 @@ namespace OMS.Infrastructure.Communication.Handlers
 			GetEntityRequest<TEntity> request, 
 			CancellationToken cancellationToken = default)
 		{
-			var dbSet = dbContext.Set<TEntity>();
-			var entity = await dbSet.FindAsync([request.Id], cancellationToken);
+			IQueryable<TEntity> query = dbContext.Set<TEntity>();
+
+			// Apply all registered query filters for this entity type
+			foreach (var filter in queryFilters)
+			{
+				query = filter.Apply(query);
+			}
+
+			// Filter by ID and execute
+			var entity = await query.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
 			if (entity == null)
 			{
-				return Result.Failure<EntityResponse<TEntity>>($"Entity with ID {request.Id} not found");
+				return Result.Failure<EntityResponse<TEntity>>($"Entity with ID {request.Id} not found or filtered out");
 			}
 
 			var response = new EntityResponse<TEntity>(entity);
@@ -150,12 +161,14 @@ namespace OMS.Infrastructure.Communication.Handlers
 	}
 
 	/// <summary>
-	/// Generic handler for getting a list of entities
-	/// This handler will be used unless a more specific implementation exists
-	/// TODO: Add pagination, filtering, sorting support
+	/// Generic handler for getting a list of entities.
+	/// Now integrates IEntityQueryFilter for deferred cross-cutting query constraints.
+	/// TODO: Add pagination, sorting support.
 	/// </summary>
 	/// <typeparam name="TEntity">The entity type to retrieve</typeparam>
-	internal class GetEntitiesRequestHandler<TEntity>(ApplicationDbContext dbContext) 
+	internal class GetEntitiesRequestHandler<TEntity>(
+		ApplicationDbContext dbContext,
+		IEnumerable<IEntityQueryFilter<TEntity>> queryFilters) 
 		: IScopedHandler, IRequestHandler<GetEntitiesRequest<TEntity>, EntityListResponse<TEntity>>
 		where TEntity : Entity
 	{
@@ -163,8 +176,15 @@ namespace OMS.Infrastructure.Communication.Handlers
 			GetEntitiesRequest<TEntity> request, 
 			CancellationToken cancellationToken = default)
 		{
-			var dbSet = dbContext.Set<TEntity>();
-			var entities = await dbSet.ToListAsync(cancellationToken);
+			IQueryable<TEntity> query = dbContext.Set<TEntity>();
+
+			// Apply all registered query filters for this entity type
+			foreach (var filter in queryFilters)
+			{
+				query = filter.Apply(query);
+			}
+
+			var entities = await query.ToListAsync(cancellationToken);
 
 			var response = new EntityListResponse<TEntity>(entities);
 			return Result.Success(response);
