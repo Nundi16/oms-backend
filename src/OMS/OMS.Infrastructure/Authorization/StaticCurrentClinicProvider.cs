@@ -9,7 +9,7 @@ namespace OMS.Infrastructure.Authorization
 	internal sealed class StaticCurrentClinicProvider : ICurrentClinicProvider
 	{
 		// TODO: Replace with actual user context resolution
-		private static readonly Guid PocClinicId = Guid.Parse("019edc9f-a5ef-72b4-9350-0e1f14d32e2b");
+		private static readonly Guid PocClinicId = Guid.Parse("019ee0b1-9030-72f7-b887-b4b5612427fb");
 
 		public Guid GetCurrentClinicId()
 		{

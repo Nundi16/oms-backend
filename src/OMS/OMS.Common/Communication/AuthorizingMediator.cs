@@ -31,6 +31,17 @@ namespace OMS.Common.Communication
             return Task.WhenAll(tasks);
         }
 
+        public async Task FanOutSequentialAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
+        {
+            var handlers = ServiceProvider.GetServices<IEventHandler<TEvent>>()
+                .Where(handler => AuthorizationGuard.Authorize<IEventHandler<TEvent>, TEvent>(handler).Succeeded);
+
+            foreach (var handler in handlers)
+            {
+                await handler.HandleAsync(@event, cancellationToken);
+            }
+        }
+
         public Task<IResult<TResponse>> RequestAsync<TEvent, TResponse>(TEvent @event, CancellationToken cancellationToken = default)
             where TEvent : class
             where TResponse : class

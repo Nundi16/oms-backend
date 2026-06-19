@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using OMS.Application.Communication.Queries;
 using OMS.Application.Communication.Requests;
 using OMS.Application.Communication.Responses;
+using OMS.Application.Connectors.Pipeline;
 using OMS.Application.Interfaces.Communication;
 using OMS.Common;
 using OMS.Common.Abstractions.Entity;
 using OMS.Common.Interfaces;
+using OMS.Common.Interfaces.Communication;
 using OMS.Common.Interfaces.Communication.Handlers;
 using OMS.Common.Interfaces.Communication.Handlers.Request;
 using OMS.Domain.Abstractions.Events;
@@ -74,7 +75,6 @@ namespace OMS.Infrastructure.Communication.Handlers
 			{
 				return Result.Failure<EntityResponse<TEntity>>($"Entity with ID {request.Id} not found");
 			}
-
 			// Update the entity using the infrastructure mediator
 			var modificationEvent = new ModificationDomainEvent<TEntity>(request.Entity);
 			var updatedEntity = infrastructureMediator.HandleModification<ModificationDomainEvent<TEntity>, TEntity>(
@@ -126,12 +126,14 @@ namespace OMS.Infrastructure.Communication.Handlers
 
 	/// <summary>
 	/// Generic handler for getting a single entity by ID.
-	/// Now integrates IEntityQueryFilter for deferred cross-cutting query constraints.
+	/// Composes connector-supplied LINQ filters by fanning out an <see cref="EntityQueryContext{TEntity}"/>
+	/// through the mediator. Each authorized connector handler may add deferred WHERE/JOIN
+	/// expressions to the shared query before it is materialised here.
 	/// </summary>
 	/// <typeparam name="TEntity">The entity type to retrieve</typeparam>
 	internal class GetEntityRequestHandler<TEntity>(
 		ApplicationDbContext dbContext,
-		IEnumerable<IEntityQueryFilter<TEntity>> queryFilters) 
+		IMediator mediator)
 		: IScopedHandler, IRequestHandler<GetEntityRequest<TEntity>, EntityResponse<TEntity>>
 		where TEntity : Entity
 	{
@@ -139,16 +141,11 @@ namespace OMS.Infrastructure.Communication.Handlers
 			GetEntityRequest<TEntity> request, 
 			CancellationToken cancellationToken = default)
 		{
-			IQueryable<TEntity> query = dbContext.Set<TEntity>();
+			var ctx = new EntityQueryContext<TEntity>(dbContext.Set<TEntity>());
+			await mediator.FanOutSequentialAsync(ctx, cancellationToken);
 
-			// Apply all registered query filters for this entity type
-			foreach (var filter in queryFilters)
-			{
-				query = filter.Apply(query);
-			}
-
-			// Filter by ID and execute
-			var entity = await query.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
+			// Materialise after all authorized handlers have composed their filters.
+			var entity = await ctx.Query.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
 			if (entity == null)
 			{
@@ -162,13 +159,14 @@ namespace OMS.Infrastructure.Communication.Handlers
 
 	/// <summary>
 	/// Generic handler for getting a list of entities.
-	/// Now integrates IEntityQueryFilter for deferred cross-cutting query constraints.
+	/// Composes connector-supplied LINQ filters by fanning out an <see cref="EntityQueryContext{TEntity}"/>
+	/// through the mediator before materialising the result.
 	/// TODO: Add pagination, sorting support.
 	/// </summary>
 	/// <typeparam name="TEntity">The entity type to retrieve</typeparam>
 	internal class GetEntitiesRequestHandler<TEntity>(
 		ApplicationDbContext dbContext,
-		IEnumerable<IEntityQueryFilter<TEntity>> queryFilters) 
+		IMediator mediator)
 		: IScopedHandler, IRequestHandler<GetEntitiesRequest<TEntity>, EntityListResponse<TEntity>>
 		where TEntity : Entity
 	{
@@ -176,15 +174,10 @@ namespace OMS.Infrastructure.Communication.Handlers
 			GetEntitiesRequest<TEntity> request, 
 			CancellationToken cancellationToken = default)
 		{
-			IQueryable<TEntity> query = dbContext.Set<TEntity>();
+			var ctx = new EntityQueryContext<TEntity>(dbContext.Set<TEntity>());
+			await mediator.FanOutSequentialAsync(ctx, cancellationToken);
 
-			// Apply all registered query filters for this entity type
-			foreach (var filter in queryFilters)
-			{
-				query = filter.Apply(query);
-			}
-
-			var entities = await query.ToListAsync(cancellationToken);
+			var entities = await ctx.Query.ToListAsync(cancellationToken);
 
 			var response = new EntityListResponse<TEntity>(entities);
 			return Result.Success(response);

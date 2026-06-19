@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using OMS.Application.Common.Interfaces;
 using OMS.Application.Communication.Handlers;
 using OMS.Application.Communication.Requests;
 using OMS.Application.Communication.Responses;
@@ -28,21 +29,48 @@ namespace OMS.Application
 
         private static IServiceCollection RegisterCrudDtoHandlers(this IServiceCollection services)
         {
-            // Order
-            services.AddScoped<IRequestHandler<BaseCreateRequestDto<OrderDto>, BaseResponseDto<OrderDto>>, BaseCreateRequestDtoHandler<Order, OrderDto>>();
-            services.AddScoped<IRequestHandler<BaseGetByIdRequestDto<OrderDto>, BaseResponseDto<OrderDto>>, BaseGetByIdRequestDtoHandler<Order, OrderDto>>();
-            services.AddScoped<IRequestHandler<BaseGetAllRequestDto<OrderDto>, BaseListResponseDto<OrderDto>>, BaseGetAllRequestDtoHandler<Order, OrderDto>>();
-            services.AddScoped<IRequestHandler<BaseUpdateRequestDto<OrderDto>, BaseResponseDto<OrderDto>>, BaseUpdateRequestDtoHandler<Order, OrderDto>>();
-            services.AddScoped<IRequestHandler<BaseDeleteRequestDto<OrderDto>, BaseDeleteResponseDto>, BaseDeleteRequestDtoHandler<Order, OrderDto>>();
+			var domainAssemblyTypes = AppDomain.CurrentDomain.GetAssemblies()
+				.Where(a => a.GetName().Name?.StartsWith("OMS.Application") == true)
+				.SelectMany(a => a.GetTypes());
 
-            // Clinic
-            services.AddScoped<IRequestHandler<BaseCreateRequestDto<ClinicDto>, BaseResponseDto<ClinicDto>>, BaseCreateRequestDtoHandler<Clinic, ClinicDto>>();
-            services.AddScoped<IRequestHandler<BaseGetByIdRequestDto<ClinicDto>, BaseResponseDto<ClinicDto>>, BaseGetByIdRequestDtoHandler<Clinic, ClinicDto>>();
-            services.AddScoped<IRequestHandler<BaseGetAllRequestDto<ClinicDto>, BaseListResponseDto<ClinicDto>>, BaseGetAllRequestDtoHandler<Clinic, ClinicDto>>();
-            services.AddScoped<IRequestHandler<BaseUpdateRequestDto<ClinicDto>, BaseResponseDto<ClinicDto>>, BaseUpdateRequestDtoHandler<Clinic, ClinicDto>>();
-            services.AddScoped<IRequestHandler<BaseDeleteRequestDto<ClinicDto>, BaseDeleteResponseDto>, BaseDeleteRequestDtoHandler<Clinic, ClinicDto>>();
+			var dtoEntityPairs = domainAssemblyTypes
+				.Where(t => !t.IsAbstract && t.IsClass && typeof(IDto).IsAssignableFrom(t))
+				.Select(t => new
+				{
+					DtoType = t,
+					DtoInterface = t.GetInterfaces().FirstOrDefault(i =>
+						i.IsGenericType &&
+						i.GetGenericTypeDefinition() == typeof(IDto<>))
+				})
+				.Where(x => x.DtoInterface is not null)
+				.Select(x => (DtoType: x.DtoType, EntityType: x.DtoInterface!.GetGenericArguments()[0]))
+				.ToList();
 
-            return services;
+			foreach (var (dtoType, entityType) in dtoEntityPairs)
+			{
+				services.AddScoped(typeof(IRequestHandler<,>).MakeGenericType(
+					typeof(BaseCreateRequestDto<,>).MakeGenericType(entityType, dtoType),
+					typeof(BaseResponseDto<>).MakeGenericType(entityType)),
+					typeof(BaseCreateRequestDtoHandler<,>).MakeGenericType(entityType, dtoType));
+				services.AddScoped(typeof(IRequestHandler<,>).MakeGenericType(
+					typeof(BaseUpdateRequestDto<,>).MakeGenericType(entityType, dtoType),
+					typeof(BaseResponseDto<>).MakeGenericType(entityType)),
+					typeof(BaseUpdateRequestDtoHandler<,>).MakeGenericType(entityType, dtoType));
+				services.AddScoped(typeof(IRequestHandler<,>).MakeGenericType(
+					typeof(BaseGetByIdRequestDto<,>).MakeGenericType(entityType, dtoType),
+					typeof(BaseResponseDto<>).MakeGenericType(entityType)),
+					typeof(BaseGetByIdRequestDtoHandler<,>).MakeGenericType(entityType, dtoType));
+				services.AddScoped(typeof(IRequestHandler<,>).MakeGenericType(
+					typeof(BaseGetAllRequestDto<,>).MakeGenericType(entityType, dtoType),
+					typeof(BaseListResponseDto<>).MakeGenericType(dtoType)),
+					typeof(BaseGetAllRequestDtoHandler<,>).MakeGenericType(entityType, dtoType));
+				services.AddScoped(typeof(IRequestHandler<,>).MakeGenericType(
+					typeof(BaseDeleteRequestDto<,>).MakeGenericType(entityType, dtoType),
+					typeof(BaseDeleteResponseDto)),
+					typeof(BaseDeleteRequestDtoHandler<,>).MakeGenericType(entityType, dtoType));
+			}
+
+			return services;
         }
     }
 }

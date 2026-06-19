@@ -1,5 +1,7 @@
+using OMS.Application.Common.Interfaces;
 using OMS.Application.Connectors;
 using OMS.Application.Connectors.Abstractions;
+using OMS.Domain.Modules.OrderModule;
 
 namespace OMS.Application.Modules.OrderModule.Models
 {
@@ -7,17 +9,17 @@ namespace OMS.Application.Modules.OrderModule.Models
 	/// Data transfer object for Order entity. Implements IConnectorsCarrier to participate
 	/// in the connector read/write pipeline.
 	/// </summary>
-	public sealed class OrderDto : IConnectorsCarrier
+	public sealed class OrderDto(Guid? id, string name, string? status, DateTime? deliveryDate) : IConnectorsCarrier, IDto<Order>
 	{
-		public Guid? Id { get; init; }
-		public string Name { get; init; } = string.Empty;
-		public string? Status { get; init; }
-		public DateTime? DeliveryDate { get; init; }
-		public string? DeliveryLocation { get; init; }
-		public string? Notes { get; init; }
-		public string? Product { get; init; }
-		public DateTime? ScannedAt { get; init; }
-		public string? PatientNo { get; init; }
+		public Guid? Id { get; set; } = id;
+		public string Name { get; set; } = name ?? string.Empty;
+		public string? Status { get; set; } = status;
+		public DateTime? DeliveryDate { get; set; } = deliveryDate;
+		public string? DeliveryLocation { get; set; }
+		public string? Notes { get; set; }
+		public string? Product { get; set; }
+		public DateTime? ScannedAt { get; set; }
+		public string? PatientNo { get; set; }
 
 		/// <summary>
 		/// Polymorphic collection of connector DTOs associated with this order.

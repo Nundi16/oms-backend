@@ -2,22 +2,20 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using OMS.Application.Communication.Queries;
 using OMS.Application.Communication.Requests;
 using OMS.Application.Communication.Responses;
-using OMS.Application.Connectors.Abstractions;
+using OMS.Application.Interfaces.Persistence;
 using OMS.Common.Communication;
 using OMS.Common.Interfaces;
 using OMS.Common.Interfaces.Communication.Handlers.Request;
-using OMS.Domain.Modules.OrderModule;
 using OMS.Infrastructure.Audit;
 using OMS.Infrastructure.Authorization;
 using OMS.Infrastructure.Communication;
 using OMS.Infrastructure.Communication.Handlers;
 using OMS.Infrastructure.Interceptors;
 using OMS.Infrastructure.Interfaces.Communication.Handlers;
-using OMS.Infrastructure.Modules.OrderClinicConnector;
 using OMS.Infrastructure.Options;
+using OMS.Infrastructure.Persistence;
 using static OMS.Common.Constants.Infrastructure;
 
 namespace OMS.Infrastructure
@@ -38,10 +36,11 @@ namespace OMS.Infrastructure
             // Register infrastructure-level domain event handlers used by InfrastructureMediator
             services.RegisterInfrastructureDomainEventHandlers();
 
-            // Register connector pipeline implementations
+            // Connector handlers and unit of work participate in the mediator pipeline.
             services.RegisterConnectorPipeline();
 
             // Then register specific handlers from this assembly
+            // (this picks up the OrderClinic* authorized event handlers automatically).
             services.RegisterHandlersFromCurrentAssembly();
 
             services.AddMediator();
@@ -154,13 +153,17 @@ namespace OMS.Infrastructure
 
         private static IServiceCollection RegisterConnectorPipeline(this IServiceCollection services)
         {
-            // OrderClinic connector components — Infrastructure-level since they depend on EF + DbContext
-            services.AddScoped<IConnectorReader<Order>, OrderClinicReader>();
-            services.AddScoped<IConnectorWriter<Order>, OrderClinicWriter>();
-            services.AddScoped<IEntityQueryFilter<Order>, OrderClinicCurrentClinicFilter>();
+            // Single persistence flush boundary used by Application CRUD handlers
+            // to commit connector mutations after fan-out completes.
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            // Future connectors register here following the same pattern.
+            // Authorization guard required by the OrderClinic connector handlers.
+            // RegisterHandlersFromCurrentAssembly only wires IEventHandler<TEvent>
+            // implementations, so the guard itself must be registered explicitly.
+            services.AddScoped<ClinicMembershipGuard>();
 
+            // Future connector handlers are discovered automatically by the assembly scan
+            // because they implement IEventHandler<TContext>.
             return services;
         }
     }

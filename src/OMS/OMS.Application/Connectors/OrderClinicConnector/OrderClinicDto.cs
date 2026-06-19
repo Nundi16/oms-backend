@@ -10,6 +10,6 @@ namespace OMS.Application.Connectors.OrderClinicConnector
 		/// <summary>
 		/// A clinic-specific name or identifier for this order, if applicable.
 		/// </summary>
-		public string? ClinicSpecificOrderName { get; init; }
+		public string ClinicSpecificOrderName { get; init; } = String.Empty;
 	}
 }
