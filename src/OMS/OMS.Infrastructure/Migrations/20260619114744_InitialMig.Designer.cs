@@ -12,8 +12,8 @@ using OMS.Infrastructure;
 namespace OMS.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260618221507_add-connector-fks-and-orderclinic-config")]
-    partial class addconnectorfksandorderclinicconfig
+    [Migration("20260619114744_InitialMig")]
+    partial class InitialMig
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,8 +32,8 @@ namespace OMS.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("ClinicSpecificOrderName")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -63,16 +63,11 @@ namespace OMS.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DependantId")
-                        .HasDatabaseName("IX_OrderClinics_DependantId");
+                    b.HasIndex("DependantId");
 
-                    b.HasIndex("ParentId")
-                        .HasDatabaseName("IX_OrderClinics_ParentId");
+                    b.HasIndex("ParentId");
 
-                    b.HasIndex("ParentId", "DependantId")
-                        .HasDatabaseName("IX_OrderClinics_ParentId_DependantId");
-
-                    b.ToTable("OrderClinics", (string)null);
+                    b.ToTable("OrderClinic");
                 });
 
             modelBuilder.Entity("OMS.Domain.Modules.ClinicModule.Clinic", b =>
@@ -164,6 +159,25 @@ namespace OMS.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Order");
+                });
+
+            modelBuilder.Entity("OMS.Domain.Connectors.OrderClinicConnector.OrderClinic", b =>
+                {
+                    b.HasOne("OMS.Domain.Modules.ClinicModule.Clinic", "Dependant")
+                        .WithMany()
+                        .HasForeignKey("DependantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OMS.Domain.Modules.OrderModule.Order", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dependant");
+
+                    b.Navigation("Parent");
                 });
 #pragma warning restore 612, 618
         }

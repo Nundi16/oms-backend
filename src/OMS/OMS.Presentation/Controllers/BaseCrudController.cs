@@ -43,5 +43,11 @@ namespace OMS.Presentation.Controllers
 			var result = await mediator.RequestAsync<BaseDeleteRequestDto<TDto>, BaseDeleteResponseDto>(new BaseDeleteRequestDto<TDto>(id), cancellationToken);
 			return result.Succeeded ? Ok(result.Value) : BadRequest(result.ErrorMessage);
 		}
-	}
+
+        public virtual async Task<IActionResult> GetFilters()
+        {
+            //TODO: Use DTO for filters
+            return Ok(new { Filters = new List<string>() });
+        }
+    }
 }

@@ -6,6 +6,7 @@
     /// </summary>
     public abstract class BaseConnectorDto
     {
+        public virtual string Descriptor { get; }
         /// <summary>
         /// The unique identifier of this connector instance.
         /// </summary>

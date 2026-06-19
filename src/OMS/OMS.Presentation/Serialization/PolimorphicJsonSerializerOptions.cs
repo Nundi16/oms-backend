@@ -75,7 +75,7 @@ namespace OMS.Presentation.Serialization
                 {
                     ti.PolymorphismOptions = new JsonPolymorphismOptions
                     {
-                        TypeDiscriminatorPropertyName = "Type",
+                        TypeDiscriminatorPropertyName = "Descriptor",
                         IgnoreUnrecognizedTypeDiscriminators = false
                     };
 

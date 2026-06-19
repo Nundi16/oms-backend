@@ -6,6 +6,7 @@ namespace OMS.Application.Connectors.OrderClinicConnector
 	/// </summary>
 	public sealed class OrderClinicDto : BaseConnectorDto
 	{
+        public override string Descriptor => nameof(OrderClinicDto);
 		/// <summary>
 		/// A clinic-specific name or identifier for this order, if applicable.
 		/// </summary>
