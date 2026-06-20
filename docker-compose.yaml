@@ -47,6 +47,12 @@ services:
     restart: unless-stopped
     ports:
       - "9011:9011"
+    # host.docker.internal resolves to the Docker host. Docker Desktop maps it
+    # automatically; on Linux engines we map it explicitly via host-gateway so
+    # webhook callbacks (e.g. /webhooks/auth-events on the host API) reach the
+    # backend running outside the container.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       DATABASE_URL: jdbc:postgresql://authdb:5432/fusionauth
       DATABASE_ROOT_USERNAME: postgres

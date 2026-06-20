@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
 using OMS.Common;
 using OMS.Common.Interfaces;
 using OMS.Presentation.Authorization;
+using OMS.Presentation.Hubs;
+using OMS.Presentation.Webhooks.FusionAuth;
 
 namespace OMS.Presentation
 {
@@ -14,6 +17,20 @@ namespace OMS.Presentation
             services.AddScoped<IUserContext, HttpUserContext>();
 
             services.AddFusionAuthJwtBearer(configuration);
+            services.AddAuthEventsRealtime(configuration);
+
+            return services;
+        }
+
+        private static IServiceCollection AddAuthEventsRealtime(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<FusionAuthWebhookOptions>(
+                configuration.GetSection(FusionAuthWebhookOptions.SectionName));
+
+            // Route SignalR Clients.User(id) lookups by the JWT 'sub' claim.
+            services.AddSingleton<IUserIdProvider, SubClaimUserIdProvider>();
+
+            services.AddSignalR();
 
             return services;
         }
@@ -56,6 +73,24 @@ namespace OMS.Presentation
                         ValidateIssuerSigningKey = true,
                         NameClaimType = "preferred_username",
                         RoleClaimType = Constants.Auth.ROLE_CLAIM_TYPE,
+                    };
+
+                    // Browser WebSocket clients cannot set the Authorization header during the
+                    // upgrade handshake, so SignalR clients pass the token as ?access_token=...
+                    // We pick it up here for any request under /hubs and treat it as the bearer.
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken)
+                                && path.StartsWithSegments("/hubs", StringComparison.OrdinalIgnoreCase))
+                            {
+                                context.Token = accessToken!;
+                            }
+                            return Task.CompletedTask;
+                        }
                     };
                 });
 

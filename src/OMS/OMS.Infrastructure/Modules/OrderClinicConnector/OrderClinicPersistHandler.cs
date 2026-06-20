@@ -10,17 +10,6 @@ using OMS.Infrastructure.Modules.ConnectorPipeline;
 
 namespace OMS.Infrastructure.Modules.OrderClinicConnector
 {
-	/// <summary>
-	/// OrderClinic-specific binding of <see cref="BaseConnectorPersistHandler{TParent,TDependant,TConnectorEntity,TConnectorDto,TGuard}"/>.
-	/// All persistence logic (diff, replace, upsert) lives in the base; this leaf merely
-	/// picks the concrete generic arguments and the authorization guard.
-	/// <para>
-	/// Authorization: gated by <see cref="ModuleRuleGuard"/> requiring the
-	/// <c>clinic_enabled</c> role. Principals without that role are silently skipped
-	/// by <see cref="OMS.Common.Communication.AuthorizingMediator"/> during fan-out,
-	/// so the parent Order is still created/updated but no clinic links are written.
-	/// </para>
-	/// </summary>
 	internal sealed class OrderClinicPersistHandler(
 		IUserContext userContext,
 		ApplicationDbContext dbContext,

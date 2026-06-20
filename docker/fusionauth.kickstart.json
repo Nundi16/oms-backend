@@ -19,7 +19,9 @@
     "setupPasswordTemplateId": "b1a2c3d4-5678-9abc-def0-222222222222",
     "welcomeEmailTemplateId": "e3a1b2c4-5678-9abc-def0-123456789abc",
     "testPcUserId": "c1a2b3c4-5678-9abc-def0-123456789abc",
-    "testMobileUserId": "c2b3c4d5-6789-abcd-ef01-23456789abcd"
+    "testMobileUserId": "c2b3c4d5-6789-abcd-ef01-23456789abcd",
+    "omsBackendWebhookId": "a0a0a0a0-0000-0000-0000-000000000001",
+    "omsBackendWebhookSecret": "local-dev-webhook-secret"
   },
   "requests": [
     {
@@ -240,6 +242,9 @@
           "roles": [
             {
               "name": "User"
+            },
+            {
+              "name": "Clinic Admin"
             }
           ],
           "oauthConfiguration": {
@@ -359,6 +364,29 @@
             ],
             "enabled": true
           }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "url": "/api/webhook/#{omsBackendWebhookId}",
+      "body": {
+        "webhook": {
+          "description": "OMS backend auth-events webhook (role / registration changes).",
+          "url": "http://host.docker.internal:5243/webhooks/auth-events",
+          "connectTimeout": 2000,
+          "readTimeout": 5000,
+          "headers": {
+            "Authorization": "Bearer #{omsBackendWebhookSecret}"
+          },
+          "eventsEnabled": {
+            "user.registration.create": true,
+            "user.registration.update": true,
+            "user.registration.delete": true
+          },
+          "tenantIds": [
+            "#{omsTenantId}"
+          ]
         }
       }
     }

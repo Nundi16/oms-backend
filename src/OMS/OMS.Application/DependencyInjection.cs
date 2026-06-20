@@ -29,6 +29,7 @@ namespace OMS.Application
 
         private static IServiceCollection RegisterCrudDtoHandlers(this IServiceCollection services)
         {
+			//TODO: Ez így buzis, ha saját assemblybe currentAssembly
 			var domainAssemblyTypes = AppDomain.CurrentDomain.GetAssemblies()
 				.Where(a => a.GetName().Name?.StartsWith("OMS.Application") == true)
 				.SelectMany(a => a.GetTypes());
