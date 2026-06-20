@@ -20,6 +20,7 @@ namespace OMS.Infrastructure.Authorization
 
 		public override IResult Authorize()
 		{
+			
 			var clinicId = currentClinicProvider.GetCurrentClinicId();
 			return clinicId != Guid.Empty
 				? Result.Success()

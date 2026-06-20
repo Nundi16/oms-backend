@@ -6,7 +6,6 @@ using OMS.Application.Communication.Requests;
 using OMS.Application.Communication.Responses;
 using OMS.Application.Interfaces.Persistence;
 using OMS.Common.Communication;
-using OMS.Common.Interfaces;
 using OMS.Common.Interfaces.Communication.Handlers.Request;
 using OMS.Infrastructure.Audit;
 using OMS.Infrastructure.Authorization;
@@ -145,7 +144,7 @@ namespace OMS.Infrastructure
 
         private static IServiceCollection AddInternalAuthorization(this IServiceCollection services)
         {
-            services.AddScoped<IUserContext, UserContext>();
+            // IUserContext is contributed by the Presentation layer (HTTP-bound).
             services.AddScoped<OMS.Application.Interfaces.Authorization.ICurrentClinicProvider, StaticCurrentClinicProvider>();
 
             return services;
@@ -157,13 +156,10 @@ namespace OMS.Infrastructure
             // to commit connector mutations after fan-out completes.
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            // Authorization guard required by the OrderClinic connector handlers.
-            // RegisterHandlersFromCurrentAssembly only wires IEventHandler<TEvent>
-            // implementations, so the guard itself must be registered explicitly.
-            services.AddScoped<ClinicMembershipGuard>();
-
-            // Future connector handlers are discovered automatically by the assembly scan
-            // because they implement IEventHandler<TContext>.
+            // Connector handlers are discovered automatically by the assembly scan
+            // because they implement IEventHandler<TContext>. Their authorization
+            // guards (e.g. ModuleRuleGuard) are constructed inline at the handler
+            // call site, so no extra DI registration is needed here.
             return services;
         }
     }

@@ -8,10 +8,9 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddPresentation();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddPresentation();
+builder.Services.AddPresentation(builder.Configuration);
 
 builder.Services.AddRouting(options =>
 {
@@ -26,6 +25,18 @@ builder.Services.AddRequestTimeouts();
 //builder.Services.AddExceptionHandler<>();
 //builder.Services.AddResponseCaching();
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("DevelopmentAll", policy => policy
+            .SetIsOriginAllowed(_ => true)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
+    });
+}
+
 builder.Services.AddControllers().AddJsonOptions(option =>
     PolymorphicJsonOption.Configure(option.JsonSerializerOptions, typeof(BaseConnectorDto)));
 
@@ -37,10 +48,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseCors("DevelopmentAll");
 }
 
 app.UseHttpsRedirection();
 app.UseHealthChecks("/health");
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
 app.UseRequestTimeouts();

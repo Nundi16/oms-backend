@@ -18,6 +18,18 @@
             }
         }
 
+        public static class Auth
+        {
+            // FusionAuth emits roles in a JWT array claim named "roles".
+            // Used both by the JwtBearer RoleClaimType and by ModuleRuleGuard.
+            public const string ROLE_CLAIM_TYPE = "roles";
+
+            public static class Roles
+            {
+                public const string CLINIC_ENABLED = "Clinic Modul";
+            }
+        }
+
         public static class Errors
         {
             public const string AUTHORIZATION_FAILED = nameof(AUTHORIZATION_FAILED);
