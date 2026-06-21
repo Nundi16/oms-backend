@@ -92,6 +92,22 @@
             "setPasswordEmailTemplateId": "#{setupPasswordTemplateId}",
             "defaultFromEmail": "noreply@example.localhost",
             "defaultFromName": "OMS"
+          },
+          "eventConfiguration": {
+            "events": {
+              "user.registration.create": {
+                "enabled": true,
+                "transactionType": "None"
+              },
+              "user.registration.update": {
+                "enabled": true,
+                "transactionType": "None"
+              },
+              "user.registration.delete": {
+                "enabled": true,
+                "transactionType": "None"
+              }
+            }
           }
         }
       }
@@ -125,6 +141,9 @@
           "roles": [
             {
               "name": "Admin"
+            },
+            {
+              "name": "Clinic Module"
             },
             {
               "name": "Clinician"
@@ -187,6 +206,9 @@
               "name": "Admin"
             },
             {
+              "name": "Clinic Module"
+            },
+            {
               "name": "Clinician"
             },
             {
@@ -240,6 +262,9 @@
         "application": {
           "name": "test-tenant-list-app",
           "roles": [
+            {
+              "name": "Clinic Module"
+            },
             {
               "name": "User"
             },
