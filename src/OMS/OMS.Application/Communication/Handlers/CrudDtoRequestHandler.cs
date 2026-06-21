@@ -126,7 +126,8 @@ namespace OMS.Application.Communication.Handlers
         public async Task<IResult<BaseListResponseDto<TDto>>> HandleAsync(BaseGetAllRequestDto<TEntity, TDto> @event, CancellationToken cancellationToken = default)
         {
             var result = await mediator.RequestAsync<GetEntitiesRequest<TEntity>, EntityListResponse<TEntity>>(
-                new GetEntitiesRequest<TEntity>(),
+                new GetEntitiesRequest<TEntity>([.. @event.Filters.Where(filter => filter.Module == typeof(TEntity).Name)
+                    .Select(f => new Filter(f.Field, f.FilterOperator, f.Value))]),
                 cancellationToken);
 
             if (!result.Succeeded || result.Value is null)

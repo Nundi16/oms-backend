@@ -1,3 +1,4 @@
+using OMS.Application.Models;
 using OMS.Common.Abstractions.Entity;
 
 namespace OMS.Application.Communication.Requests
@@ -30,5 +31,5 @@ namespace OMS.Application.Communication.Requests
 	/// Generic request for getting a list of entities (future: pagination, filtering, sorting)
 	/// </summary>
 	/// <typeparam name="TEntity">The entity type to retrieve</typeparam>
-	public sealed record GetEntitiesRequest<TEntity>() where TEntity : Entity;
+	public sealed record GetEntitiesRequest<TEntity>(IList<Filter> Filters) where TEntity : Entity;
 }

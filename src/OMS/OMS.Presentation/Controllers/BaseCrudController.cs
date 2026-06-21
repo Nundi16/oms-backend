@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using OMS.Application.Common.Interfaces;
 using OMS.Application.Communication.Requests;
 using OMS.Application.Communication.Responses;
+using OMS.Application.Models;
 using OMS.Common.Abstractions.Entity;
 using OMS.Common.Interfaces.Communication;
 
@@ -24,10 +25,10 @@ namespace OMS.Presentation.Controllers
 			return result.Succeeded ? Ok(result.Value) : NotFound(result.ErrorMessage);
 		}
 
-		[HttpGet]
-		public virtual async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
+		[HttpPost("filteredList")]
+		public virtual async Task<IActionResult> GetAll(IReadOnlyList<FilterDto> filters, CancellationToken cancellationToken = default)
 		{
-			var result = await mediator.RequestAsync<BaseGetAllRequestDto<TEntity, TDto>, BaseListResponseDto<TDto>>(new BaseGetAllRequestDto<TEntity, TDto>(), cancellationToken);
+			var result = await mediator.RequestAsync<BaseGetAllRequestDto<TEntity, TDto>, BaseListResponseDto<TDto>>(new BaseGetAllRequestDto<TEntity, TDto>(filters), cancellationToken);
 			return result.Succeeded ? Ok(result.Value) : BadRequest(result.ErrorMessage);
 		}
 

@@ -5,6 +5,7 @@ using OMS.Application.Connectors.Pipeline;
 using OMS.Application.Interfaces.Communication;
 using OMS.Common;
 using OMS.Common.Abstractions.Entity;
+using OMS.Common.Filter.Enums;
 using OMS.Common.Interfaces;
 using OMS.Common.Interfaces.Communication;
 using OMS.Common.Interfaces.Communication.Handlers;
@@ -177,7 +178,16 @@ namespace OMS.Infrastructure.Communication.Handlers
 			var ctx = new EntityQueryContext<TEntity>(dbContext.Set<TEntity>());
 			await mediator.FanOutSequentialAsync(ctx, cancellationToken);
 
-			var entities = await ctx.Query.ToListAsync(cancellationToken);
+			var query = ctx.Query;
+			//TODO: This is only works for strings! Just for the demo! Generalize and make it a helper!
+			foreach (var filter in request.Filters)
+			{
+				query = filter.FilterOperator == FilterOperator.Equals ?
+					query.Where(x => EF.Property<string>(x, filter.Name) == filter.Value) :
+					query.Where(x => EF.Property<string>(x, filter.Name).Contains(filter.Value));	
+			}
+
+            var entities = await query.ToListAsync(cancellationToken);
 
 			var response = new EntityListResponse<TEntity>(entities);
 			return Result.Success(response);
