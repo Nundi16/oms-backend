@@ -46,10 +46,13 @@ namespace OMS.Presentation.Controllers
 			return result.Succeeded ? Ok(result.Value) : BadRequest(result.ErrorMessage);
 		}
 
-        public virtual async Task<IActionResult> GetFilters()
+		[HttpGet("filters")]
+        public virtual async Task<IActionResult> GetFilters(CancellationToken cancellationToken = default)
         {
-            //TODO: Use DTO for filters
-            return Ok(new { Filters = new List<string>() });
+			//TODO: Use DTO for filters
+			var result = await mediator.RequestAsync<BaseFilterRequestDto<TEntity>, BaseFilterResponseDto>(new BaseFilterRequestDto<TEntity>(), cancellationToken);
+
+            return Ok(new { result.Value.Filters });
         }
     }
 }

@@ -1,15 +1,11 @@
-﻿using AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using OMS.Application.Common.Interfaces;
 using OMS.Application.Communication.Handlers;
 using OMS.Application.Communication.Requests;
 using OMS.Application.Communication.Responses;
-using OMS.Application.Modules.ClinicModule.Models;
-using OMS.Application.Modules.OrderModule.Models;
 using OMS.Common.Communication;
 using OMS.Common.Interfaces.Communication.Handlers.Request;
-using OMS.Domain.Modules.ClinicModule;
-using OMS.Domain.Modules.OrderModule;
+using System.Reflection;
 
 namespace OMS.Application
 {
@@ -23,29 +19,40 @@ namespace OMS.Application
             // Register specific handlers from the assembly
             // These will override the generic handlers (from Infrastructure) for specific entity types
             services.RegisterHandlersFromCurrentAssembly();
+			services.RegisterFilterableService();
 
             return services;
         }
 
-        private static IServiceCollection RegisterCrudDtoHandlers(this IServiceCollection services)
-        {
-			//TODO: Ez így buzis, ha saját assemblybe currentAssembly
-			var domainAssemblyTypes = AppDomain.CurrentDomain.GetAssemblies()
-				.Where(a => a.GetName().Name?.StartsWith("OMS.Application") == true)
+
+		private static IServiceCollection RegisterFilterableService(this IServiceCollection services)
+		{
+            var domainAssemblyTypes = AppDomain.CurrentDomain.GetAssemblies()
+				.Where(a => a.GetName().Name?.StartsWith("OMS.Domain") == true)
 				.SelectMany(a => a.GetTypes());
 
-			var dtoEntityPairs = domainAssemblyTypes
+            var entityTypes = domainAssemblyTypes
+                .Where(t => !t.IsAbstract && t.IsClass && typeof(OMS.Common.Abstractions.Entity.Entity).IsAssignableFrom(t))
+                .ToList();
+
+			foreach (var entityType in entityTypes)
+			{
+                services.AddScoped(typeof(IRequestHandler<,>).MakeGenericType(
+					typeof(BaseFilterRequestDto<>).MakeGenericType(entityType),
+					typeof(BaseFilterResponseDto)),
+					typeof(GetAllFilterHandler<>).MakeGenericType(entityType));
+            }
+
+			return services;
+        }
+
+        private static IServiceCollection RegisterCrudDtoHandlers(this IServiceCollection services)
+        {
+			var dtoEntityPairs = Assembly.GetCallingAssembly().GetTypes()
 				.Where(t => !t.IsAbstract && t.IsClass && typeof(IDto).IsAssignableFrom(t))
-				.Select(t => new
-				{
-					DtoType = t,
-					DtoInterface = t.GetInterfaces().FirstOrDefault(i =>
-						i.IsGenericType &&
-						i.GetGenericTypeDefinition() == typeof(IDto<>))
-				})
-				.Where(x => x.DtoInterface is not null)
-				.Select(x => (DtoType: x.DtoType, EntityType: x.DtoInterface!.GetGenericArguments()[0]))
-				.ToList();
+                .Select(t => (DtoType: t, EntytyType: t.GetInterfaces().FirstOrDefault(i =>
+					i.IsGenericType == true && i.GetGenericTypeDefinition() == typeof(IDto<>))!.GetGenericArguments()[0]
+				)).ToList();
 
 			foreach (var (dtoType, entityType) in dtoEntityPairs)
 			{
@@ -69,7 +76,7 @@ namespace OMS.Application
 					typeof(BaseDeleteRequestDto<,>).MakeGenericType(entityType, dtoType),
 					typeof(BaseDeleteResponseDto)),
 					typeof(BaseDeleteRequestDtoHandler<,>).MakeGenericType(entityType, dtoType));
-			}
+            }
 
 			return services;
         }

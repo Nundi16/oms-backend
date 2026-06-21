@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OMS.Application.Communication.Requests;
 using OMS.Application.Communication.Responses;
 using OMS.Application.Interfaces.Persistence;
+using OMS.Common.Abstractions.Entity;
 using OMS.Common.Communication;
 using OMS.Common.Interfaces.Communication.Handlers.Request;
 using OMS.Infrastructure.Audit;
@@ -15,6 +16,7 @@ using OMS.Infrastructure.Interceptors;
 using OMS.Infrastructure.Interfaces.Communication.Handlers;
 using OMS.Infrastructure.Options;
 using OMS.Infrastructure.Persistence;
+using System.Reflection;
 using static OMS.Common.Constants.Infrastructure;
 
 namespace OMS.Infrastructure
@@ -84,7 +86,6 @@ namespace OMS.Infrastructure
 
         private static IServiceCollection RegisterGenericHandlers(this IServiceCollection services)
         {
-            // Find all entity types in the Domain assembly that inherit from Entity
             var domainAssemblyTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a => a.GetName().Name?.StartsWith("OMS.Domain") == true)
                 .SelectMany(a => a.GetTypes());
@@ -95,17 +96,15 @@ namespace OMS.Infrastructure
 
             foreach (var entityType in entityTypes)
             {
+                var responseType = typeof(EntityResponse<>).MakeGenericType(entityType);
                 // Register CreateEntityRequestHandler<TEntity>
-                var createRequestType = typeof(CreateEntityRequest<>).MakeGenericType(entityType);
-                var createResponseType = typeof(EntityResponse<>).MakeGenericType(entityType);
-                var createHandlerInterface = typeof(IRequestHandler<,>).MakeGenericType(createRequestType, createResponseType);
-                var createHandlerImplementation = typeof(CreateEntityRequestHandler<>).MakeGenericType(entityType);
-                services.AddScoped(createHandlerInterface, createHandlerImplementation);
+                var createHandlerInterface = typeof(IRequestHandler<,>).MakeGenericType(
+                    typeof(CreateEntityRequest<>).MakeGenericType(entityType), responseType);
+                services.AddScoped(createHandlerInterface, typeof(CreateEntityRequestHandler<>).MakeGenericType(entityType));
 
                 // Register UpdateEntityRequestHandler<TEntity>
                 var updateRequestType = typeof(UpdateEntityRequest<>).MakeGenericType(entityType);
-                var updateResponseType = typeof(EntityResponse<>).MakeGenericType(entityType);
-                var updateHandlerInterface = typeof(IRequestHandler<,>).MakeGenericType(updateRequestType, updateResponseType);
+                var updateHandlerInterface = typeof(IRequestHandler<,>).MakeGenericType(updateRequestType, responseType);
                 var updateHandlerImplementation = typeof(UpdateEntityRequestHandler<>).MakeGenericType(entityType);
                 services.AddScoped(updateHandlerInterface, updateHandlerImplementation);
 
@@ -117,8 +116,7 @@ namespace OMS.Infrastructure
 
                 // Register GetEntityRequestHandler<TEntity>
                 var getRequestType = typeof(GetEntityRequest<>).MakeGenericType(entityType);
-                var getResponseType = typeof(EntityResponse<>).MakeGenericType(entityType);
-                var getHandlerInterface = typeof(IRequestHandler<,>).MakeGenericType(getRequestType, getResponseType);
+                var getHandlerInterface = typeof(IRequestHandler<,>).MakeGenericType(getRequestType, responseType);
                 var getHandlerImplementation = typeof(GetEntityRequestHandler<>).MakeGenericType(entityType);
                 services.AddScoped(getHandlerInterface, getHandlerImplementation);
 

@@ -1,4 +1,6 @@
 ﻿using OMS.Common.Abstractions.Entity;
+using OMS.Common.Attributes;
+using OMS.Common.Filter.Enums;
 
 namespace OMS.Domain.Connectors
 {
@@ -8,6 +10,7 @@ namespace OMS.Domain.Connectors
     {
         public Guid ParentId { get; set; }
         public TParent? Parent { get; set; }
+        [Filterable(nameof(DependantId), FilterOperator.Equals)]
         public Guid DependantId { get; set; }
         public TDependant? Dependant { get; set; }
     }
