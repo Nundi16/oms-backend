@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OMS.Common.Abstractions.Entity;
 using OMS.Common.Interfaces.Communication;
 using OMS.Domain.Abstractions.Events;
@@ -25,6 +26,7 @@ namespace OMS.Presentation.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> CreateAsync(CreationDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
         {
             var result = Mediator.RequestAsync<CreationDomainEvent<TEntity>, TResponse>(request, cancellationToken);

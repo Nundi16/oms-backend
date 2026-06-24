@@ -1,6 +1,6 @@
 ﻿namespace OMS.Application.Interfaces.Persistation
 {
-    internal interface IDbContext
+    public interface IDbContext
     {
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
