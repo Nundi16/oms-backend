@@ -12,12 +12,4 @@ namespace OMS.Common.Abstractions.Communication.Handlers.Request
     {
         public abstract Task<IResult<TResponse>> HandleAsync(TRequest request, CancellationToken cancellationToken = default);
     }
-
-    public abstract class AuthorizedRequestHandler<TResponse, TAuthorizationGuard>(TAuthorizationGuard guard)
-        : AuthorizedHandler<TAuthorizationGuard>(guard),
-        IRequestHandler<TResponse>
-        where TAuthorizationGuard : IAuthorizationGuard
-    {
-        public abstract Task<IResult<TResponse>> HandleAsync(CancellationToken cancellationToken = default);
-    }
 }

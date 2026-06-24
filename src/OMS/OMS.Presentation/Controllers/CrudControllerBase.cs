@@ -2,6 +2,7 @@
 using OMS.Common.Abstractions.Entity;
 using OMS.Common.Interfaces.Communication;
 using OMS.Domain.Abstractions.Events;
+using OMS.Domain.Interfaces.Events;
 
 namespace OMS.Presentation.Controllers
 {
@@ -24,13 +25,9 @@ namespace OMS.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> CreateAsync(CreationDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
         {
-            // main entity, entity.connector
-            // [ entity, entity.connector ].Select(x => x.toDomainEvent())
-            // handler.RequestAll([])
-            // done
-            var result = Mediator.RequestAsync<CreationDomainEvent<TEntity>, TResponse>(cancellationToken);
+            var result = Mediator.RequestAsync<CreationDomainEvent<TEntity>, TResponse>(request, cancellationToken);
             return Ok();
         }
 
