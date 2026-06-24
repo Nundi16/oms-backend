@@ -1,10 +1,11 @@
-﻿using OMS.Common.Abstractions.Entity;
+﻿using OMS.Common.Interfaces.Entity;
+using OMS.Domain.Interfaces.Connectors;
 using OMS.Domain.Interfaces.Events;
 
 namespace OMS.Domain.Abstractions.Events
 {
-    public record DeletionDomainEvent<TEntity>(TEntity Entity)
-        : DomainEvent<TEntity>(Entity),
+    public record DeletionDomainEvent<TEntity>(TEntity Entity, IConnector[] Connectors)
+        : DomainEvent<TEntity>(Entity, Connectors),
         IDeletionDomainEvent<TEntity>
-        where TEntity : Entity;
+        where TEntity : IEntity<Guid>;
 }

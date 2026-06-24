@@ -16,7 +16,7 @@ namespace OMS.Common.Communication
         {
             var handler = ServiceProvider.GetRequiredService<IEventHandler<TEvent>>();
 
-            return AuthorizationGuard.Authorize<IEventHandler<TEvent>, TEvent>(handler).Succeeded
+            return AuthorizationGuard.Authorize(handler).Succeeded
                 ? handler.HandleAsync(@event, cancellationToken)
                 : Task.CompletedTask;
         }
@@ -24,7 +24,7 @@ namespace OMS.Common.Communication
         public Task FanOutAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
         {
             var handlers = ServiceProvider.GetServices<IEventHandler<TEvent>>()
-                .Where(handler => AuthorizationGuard.Authorize<IEventHandler<TEvent>, TEvent>(handler).Succeeded);
+                .Where(handler => AuthorizationGuard.Authorize(handler).Succeeded);
 
             var tasks = handlers.Select(handler => handler.HandleAsync(@event, cancellationToken)).ToArray();
 
@@ -37,17 +37,8 @@ namespace OMS.Common.Communication
         {
             var handler = ServiceProvider.GetRequiredService<IRequestHandler<TRequest, TResponse>>();
 
-            return AuthorizationGuard.Authorize<IRequestHandler<TRequest, TResponse>, TRequest>(handler).Succeeded
-                ? handler.HandleAsync(request, cancellationToken)
-                : Task.FromResult(Result.Failure<TResponse>(""));
-        }
-
-        public Task<IResult<TResponse>> RequestAsync<TResponse>(CancellationToken cancellationToken = default) where TResponse : class
-        {
-            var handler = ServiceProvider.GetRequiredService<IRequestHandler<TResponse>>();
-
             return AuthorizationGuard.Authorize(handler).Succeeded
-                ? handler.HandleAsync(cancellationToken)
+                ? handler.HandleAsync(request, cancellationToken)
                 : Task.FromResult(Result.Failure<TResponse>(""));
         }
     }

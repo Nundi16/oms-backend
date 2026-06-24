@@ -24,13 +24,13 @@ namespace OMS.Presentation.Extensions
             {
                 typeInfo.PolymorphismOptions = new()
                 {
-                    TypeDiscriminatorPropertyName = "descriptor"
+                    TypeDiscriminatorPropertyName = "TypeDescriptor"
                 };
 
                 foreach (var type in derivedTypes)
                 {
                     typeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(type, type.FullName 
-                        ?? throw new InvalidOperationException("Unable to get name for type.")));
+                        ?? throw new InvalidOperationException($"Unable to get name for type: '{type.Name}'.")));
                 }
             }
         }

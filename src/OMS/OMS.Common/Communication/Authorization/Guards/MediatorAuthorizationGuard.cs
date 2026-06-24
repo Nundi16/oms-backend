@@ -6,13 +6,7 @@ namespace OMS.Common.Communication.Authorization.Guards
 {
     public class MediatorAuthorizationGuard : IMediatorAuthorizationGuard
     {
-        public IResult Authorize<TEventHandler, TEvent>(TEventHandler handler)
-            where TEventHandler : IHandler
-            where TEvent : class
-        {
-            ArgumentNullException.ThrowIfNull(handler);
-
-            return handler is IAuthorizedHandler authorizedHandler ? authorizedHandler.Authorize() : Result.Success();
-        }
+        public IResult Authorize<TEventHandler>(TEventHandler handler) where TEventHandler : IHandler =>
+             handler is IAuthorizedHandler authorizedHandler ? authorizedHandler.Authorize() : Result.Success();
     }
 }

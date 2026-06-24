@@ -1,6 +1,6 @@
-﻿using OMS.Common.Abstractions.Entity;
+﻿using OMS.Common.Interfaces.Entity;
 
 namespace OMS.Domain.Interfaces.Events
 {
-    public interface IDeletionDomainEvent<out TEntity> : IDomainEvent<TEntity> where TEntity : Entity;
+    public interface IDeletionDomainEvent<out TEntity> : IDomainEvent<TEntity> where TEntity : IEntity<Guid>;
 }

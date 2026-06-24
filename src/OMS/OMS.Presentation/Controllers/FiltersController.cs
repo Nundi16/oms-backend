@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OMS.Common.Interfaces.Communication;
 
 namespace OMS.Presentation.Controllers
@@ -10,11 +11,12 @@ namespace OMS.Presentation.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync(CancellationToken cancellationToken = default)
         {
-            var optionsResult = await mediator.RequestAsync(cancellationToken);
+            throw new NotImplementedException();
+            //var optionsResult = await mediator.RequestAsync(cancellationToken);
 
-            return optionsResult.Succeeded 
-                ? Ok(optionsResult.Value)
-                : BadRequest();
+            //return optionsResult.Succeeded 
+            //    ? Ok(optionsResult.Value)
+            //    : BadRequest();
         }
     }
 }
