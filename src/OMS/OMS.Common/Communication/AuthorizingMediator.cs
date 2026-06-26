@@ -12,7 +12,7 @@ namespace OMS.Common.Communication
         protected readonly IServiceProvider ServiceProvider = serviceProvider;
         protected readonly IMediatorAuthorizationGuard AuthorizationGuard = authorizationGuard;
 
-        public Task EmitAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
+/*         public Task EmitAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
         {
             var handler = ServiceProvider.GetRequiredService<IEventHandler<TEvent>>();
 
@@ -29,7 +29,7 @@ namespace OMS.Common.Communication
             var tasks = handlers.Select(handler => handler.HandleAsync(@event, cancellationToken)).ToArray();
 
             return Task.WhenAll(tasks);
-        }
+        } */
 
         public Task<IResult<TResponse>> RequestAsync<TRequest, TResponse>(TRequest request, CancellationToken cancellationToken = default)
             where TRequest : class
