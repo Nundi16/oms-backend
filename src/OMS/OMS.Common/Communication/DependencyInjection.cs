@@ -14,8 +14,8 @@ namespace OMS.Common.Communication
     {
         public static IServiceCollection AddMediator(this IServiceCollection services)
         {
-            services.AddSingleton<IMediator, AuthorizingMediator>();
-            services.AddSingleton<IMediatorAuthorizationGuard, MediatorAuthorizationGuard>();
+            services.AddScoped<IMediator, AuthorizingMediator>();
+            services.AddScoped<IMediatorAuthorizationGuard, MediatorAuthorizationGuard>();
 
             return services;
         }

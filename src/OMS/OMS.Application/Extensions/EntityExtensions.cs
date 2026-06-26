@@ -7,7 +7,7 @@ namespace OMS.Application.Extensions
 {
     internal static class EntityExtensions
     {
-        internal static IDomainEvent<TEntity> ToDomainEvent<TEntity>(this TEntity entity, IConnector[] connectors) where TEntity : IEntity<Guid>
+        internal static IDomainEvent<TEntity> ToDomainEvent<TEntity>(this TEntity entity, IConnector[]?connectors) where TEntity : IEntity<Guid>
             => new CreationDomainEvent<TEntity>(entity, connectors);
     }
 }
