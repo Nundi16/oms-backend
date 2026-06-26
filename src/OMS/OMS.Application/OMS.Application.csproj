@@ -16,7 +16,9 @@
 
   <ItemGroup>
     <Folder Include="Connectors\OrderClinic\" />
-    <Folder Include="Modules\ClinicModule\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Helpers\" />
+    <Folder Include="Interfaces\Communication\" />
   </ItemGroup>
 
 </Project>

@@ -35,11 +35,13 @@ namespace OMS.Common.Communication
             where TRequest : class
             where TResponse : class
         {
-            var handler = ServiceProvider.GetRequiredService<IRequestHandler<TRequest, TResponse>>();
+            
+                var handler = ServiceProvider.GetRequiredService<IRequestHandler<TRequest, TResponse>>();
 
-            return AuthorizationGuard.Authorize(handler).Succeeded
-                ? handler.HandleAsync(request, cancellationToken)
-                : Task.FromResult(Result.Failure<TResponse>(""));
+                return AuthorizationGuard.Authorize(handler).Succeeded
+                    ?  handler.HandleAsync(request, cancellationToken)
+                    :  Task.FromResult(Result.Failure<TResponse>(""));
+            
         }
     }
 }

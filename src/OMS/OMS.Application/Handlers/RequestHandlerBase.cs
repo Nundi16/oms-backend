@@ -1,6 +1,5 @@
-﻿using OMS.Application.Extensions;
-using OMS.Application.Helpers;
-using OMS.Application.Interfaces.Communication;
+﻿using OMS.Application.Connectors;
+using OMS.Application.Interfaces.Persistation;
 using OMS.Application.Models;
 using OMS.Common;
 using OMS.Common.Abstractions.Entity;
@@ -12,31 +11,52 @@ using OMS.Domain.Interfaces.Events;
 
 namespace OMS.Application.Handlers
 {
-    internal class RequestHandlerBase<TEntity>(IMediator mediator, IInfrastructureMediator infrastructureMediator) : IRequestHandler<IDomainEvent<TEntity>, ServiceResponse<TEntity>>
+    internal abstract class RequestHandlerBase<TEntity>(
+        IMediator mediator,
+        IRepository<TEntity> repository,
+        IConnectorEventDispatcher connectorEventDispatcher)
+        : IRequestHandler<IDomainEvent<TEntity>, ServiceResponse<TEntity>>
         where TEntity : Entity, new()
     {
         protected IMediator Mediator = mediator;
-        protected IInfrastructureMediator InfrastructureMediator = infrastructureMediator;
+        protected IRepository<TEntity> Repository = repository;
+        protected IConnectorEventDispatcher ConnectorEventDispatcher = connectorEventDispatcher;
+
         public virtual async Task<IResult<ServiceResponse<TEntity>>> HandleAsync(IDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
         {
-            TEntity entity = null!;
-            
-            if (request is ICreationDomainEvent<TEntity> creationDomainEvent)
-                entity = await InfrastructureMediator.HandleCreationAsync<ICreationDomainEvent<TEntity>, TEntity>(creationDomainEvent, cancellationToken);
-            else if (request is IModificationDomainEvent<TEntity> modificationDomainEvent)
-                entity = InfrastructureMediator.HandleModification<IModificationDomainEvent<TEntity>, TEntity>(modificationDomainEvent);
-            else if (request is IDeletionDomainEvent<TEntity> deletionDomainEvent)
-                entity = InfrastructureMediator.HandleDeletion<IDeletionDomainEvent<TEntity>, TEntity>(deletionDomainEvent);
+            TEntity entity;
+            Func<IConnector, CancellationToken, Task<IConnector?>> dispatchConnector;
 
-            var tasks = request.Connectors
-                .Select(connector => connector.ToDomainEvent([]))
-                .Select(@event => DomainEventHelpers.InvokeHandler(@event, Mediator))
+            switch (request)
+            {
+                case ICreationDomainEvent<TEntity> creationDomainEvent:
+                    entity = await Repository.AddAsync(creationDomainEvent.Entity, cancellationToken);
+                    foreach (var connector in request.Connectors ?? [])
+                    {
+                        connector.AssignSourceId(entity.Id);
+                    }
+                    dispatchConnector = ConnectorEventDispatcher.DispatchCreationAsync;
+                    break;
+                case IModificationDomainEvent<TEntity> modificationDomainEvent:
+                    entity = Repository.Update(modificationDomainEvent.Entity);
+                    dispatchConnector = ConnectorEventDispatcher.DispatchModificationAsync;
+                    break;
+                case IDeletionDomainEvent<TEntity> deletionDomainEvent:
+                    entity = Repository.Remove(deletionDomainEvent.Entity);
+                    dispatchConnector = ConnectorEventDispatcher.DispatchDeletionAsync;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            var connectorTasks = (request.Connectors ?? [])
+                .Select(connector => dispatchConnector(connector, cancellationToken))
                 .ToArray();
 
-            var connectorHandlers = await Task.WhenAll(tasks);
-            var connectors = connectorHandlers.Select(x => x.Value!.Entity as IConnector).ToArray();
+            var processedConnectors = await Task.WhenAll(connectorTasks);
+            var connectors = processedConnectors.OfType<IConnector>().ToArray();
 
-            return Result.Success(new ServiceResponse<TEntity>(entity, connectors!));
+            return Result.Success(new ServiceResponse<TEntity>(entity, connectors));
         }
     }
 }

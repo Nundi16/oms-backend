@@ -8,10 +8,10 @@ using OMS.Common.Communication;
 using OMS.Common.Interfaces;
 using OMS.Infrastructure.Audit;
 using OMS.Infrastructure.Authorization;
-using OMS.Infrastructure.Communication;
 using OMS.Infrastructure.Filters.Helpers;
 using OMS.Infrastructure.Interceptors;
 using OMS.Infrastructure.Options;
+using OMS.Infrastructure.Persistence;
 using static OMS.Common.Constants.Infrastructure;
 
 namespace OMS.Infrastructure
@@ -28,7 +28,15 @@ namespace OMS.Infrastructure
             services.RegisterHandlersFromCurrentAssembly();
 
             services.AddMediator();
-            services.AddInfrastructureMediator();
+            services.AddPersistence();
+
+            return services;
+        }
+
+        private static IServiceCollection AddPersistence(this IServiceCollection services)
+        {
+            services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+            services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
             return services;
         }
@@ -40,7 +48,7 @@ namespace OMS.Infrastructure
             {
                 options.UseNpgsql(configuration.GetConnectionString(DEFAULT_CONNECTION));
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-                options.AddInterceptors(provider.GetServices<IInterceptor>());
+                options.AddInterceptors(provider.GetServices<AuditSaveChangesInterceptor>());
             });
 
             return services;

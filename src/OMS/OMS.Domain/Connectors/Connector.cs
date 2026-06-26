@@ -8,9 +8,11 @@ namespace OMS.Domain.Connectors
         where TDependant : Entity
     {
         public abstract string TypeDescriptor { get; }
-        public Guid SourceId { get; set; }
+        public Guid? SourceId { get; set; }
         public TSource? Source { get; set; }
         public Guid DependantId { get; set; }
         public TDependant? Dependant { get; set; }
+
+    public void AssignSourceId(Guid sourceId) => SourceId = sourceId;
     }
 }

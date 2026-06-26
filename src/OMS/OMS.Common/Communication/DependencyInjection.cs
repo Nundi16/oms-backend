@@ -50,7 +50,7 @@ namespace OMS.Common.Communication
                     : ServiceLifetime.Transient;
 
         private static IEnumerable<TypeInfo> GetHandlerImplementationTypesFromAssembly(Assembly assembly) =>
-            assembly.DefinedTypes.Where(type => type is { IsAbstract: false, IsInterface: false } && typeof(IHandler).IsAssignableFrom(type));
+            assembly.DefinedTypes.Where(type => type is { IsAbstract: false, IsInterface: false, ContainsGenericParameters: false } && typeof(IHandler).IsAssignableFrom(type));
 
         private static IEnumerable<Type> GetUnderlyingInterfacesForHandler(TypeInfo typeInfo) =>
             typeInfo.GetInterfaces().Where(type => type.IsGenericType && type.Implements(typeof(IRequestHandler<,>), typeof(IEventHandler<>)));
