@@ -1,7 +1,7 @@
 ﻿using OMS.Common.Interfaces.Entity;
-using OMS.Domain.Interfaces.Connectors;
+using OMS.Common.Interfaces.Connectors;
 
-namespace OMS.Application.Models
+namespace OMS.Common.Models
 {
     public record ServiceResponse<TEntity>(TEntity? Entity, IConnector[] Connectors) where TEntity : IEntity<Guid>;
 }

@@ -8,7 +8,5 @@ namespace OMS.Application.Connectors.OrderClinicConnector.Handlers
     internal sealed class OrderClinicRequestHandler(
         IMediator mediator,
         IDbContext context)
-        : BaseHandler<OrderClinic>(mediator, context);
-
-        
+        : WriteHandler<OrderClinic>(mediator, context);
 }

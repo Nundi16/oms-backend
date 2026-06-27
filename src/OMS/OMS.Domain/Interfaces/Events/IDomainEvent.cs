@@ -1,5 +1,6 @@
 ﻿using OMS.Common.Interfaces.Entity;
-using OMS.Domain.Interfaces.Connectors;
+using OMS.Domain.Connectors;
+using OMS.Common.Interfaces.Connectors;
 
 namespace OMS.Domain.Interfaces.Events
 {

@@ -1,11 +1,13 @@
 ﻿using OMS.Application.Interfaces.Persistation;
-using OMS.Application.Models;
+using OMS.Common.Models;
 using OMS.Common;
 using OMS.Common.Abstractions.Entity;
 using OMS.Common.Interfaces;
 using OMS.Common.Interfaces.Communication;
 using OMS.Common.Interfaces.Communication.Handlers.Event;
 using OMS.Common.Interfaces.Communication.Handlers.Request;
+using OMS.Common.Interfaces.Entity;
+using OMS.Domain.Abstractions.Events;
 using OMS.Domain.Interfaces.Events;
 
 namespace OMS.Application.Handlers
@@ -27,15 +29,18 @@ namespace OMS.Application.Handlers
                 connector.AssignSourceId(entity.Id);
                 // map to domain event
                 // Call Mediator extensions - eg.: Mediator.RequestAsnyc(domainEvent)
-                Mediator.RequestAsync<ICreationDomainEvent<TEntity>, ServiceResponse<TEntity>>(null!, cancellationToken);
-                return Context.AddAsync(connector, cancellationToken);
+
+                return connector.DispatchCreationAsync(Mediator, cancellationToken);
             });
 
             var connectors = await Task.WhenAll(connectorTasks ?? []);
 
-            await Context.SaveChangesAsync(cancellationToken);
+            if (request.PersistChanges)
+            {
+                await Context.SaveChangesAsync(cancellationToken);
+            }
 
-            return Result.Success(new ServiceResponse<TEntity>(entity, connectors));
+            return Result.Success(new ServiceResponse<TEntity>(entity, [])); //TODO: connectors
         }
 
         public async Task<IResult> HandleAsync(IDeletionDomainEvent<TEntity> @event, CancellationToken cancellationToken = default)

@@ -1,5 +1,5 @@
 ﻿using OMS.Application.Interfaces.Persistation;
-using OMS.Application.Models;
+using OMS.Common.Models;
 using OMS.Common.Abstractions.Entity;
 using OMS.Common.Interfaces;
 using OMS.Common.Interfaces.Communication;
@@ -13,13 +13,13 @@ namespace OMS.Application.Handlers
         : BaseHandler<TEntity>(mediator, context)
         where TEntity : Entity, new()
     {
-        public override async Task<IResult<ServiceResponse<TEntity>>> HandleAsync(IDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
-        {
-            var result = await base.HandleAsync(request, cancellationToken);
+        //public override async Task<IResult<ServiceResponse<TEntity>>> HandleAsync(IDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
+        //{
+        //    var result = await base.HandleAsync(request, cancellationToken);
 
-            await Context.SaveChangesAsync(cancellationToken);
+        //    await Context.SaveChangesAsync(cancellationToken);
 
-            return result;
-        }
+        //    return result;
+        //}
     }
 }

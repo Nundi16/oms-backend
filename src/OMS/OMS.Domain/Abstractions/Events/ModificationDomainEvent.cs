@@ -1,5 +1,5 @@
 ﻿using OMS.Common.Interfaces.Entity;
-using OMS.Domain.Interfaces.Connectors;
+using OMS.Common.Interfaces.Connectors;
 using OMS.Domain.Interfaces.Events;
 
 namespace OMS.Domain.Abstractions.Events

@@ -9,5 +9,5 @@ namespace OMS.Application.Modules.ClinicModule.Handlers
     internal sealed class ClinicRequestHandler(
         IMediator mediator,
         IDbContext context)
-        : ApplicationRequestHandlerBase<Clinic>(mediator, context);
+        : WriteHandler<Clinic>(mediator, context);
 }

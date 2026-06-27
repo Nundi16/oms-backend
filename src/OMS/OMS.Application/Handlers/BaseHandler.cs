@@ -1,11 +1,11 @@
 ﻿using OMS.Application.Interfaces.Persistation;
-using OMS.Application.Models;
+using OMS.Common.Models;
 using OMS.Common;
 using OMS.Common.Abstractions.Entity;
 using OMS.Common.Interfaces;
 using OMS.Common.Interfaces.Communication;
 using OMS.Common.Interfaces.Communication.Handlers.Request;
-using OMS.Domain.Interfaces.Connectors;
+using OMS.Common.Interfaces.Connectors;
 using OMS.Domain.Interfaces.Events;
 
 namespace OMS.Application.Handlers

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OMS.Application.Models;
+using OMS.Common.Models;
 using OMS.Common.Interfaces.Communication;
 using OMS.Domain;
 using OMS.Domain.Modules.ClinicModule;
