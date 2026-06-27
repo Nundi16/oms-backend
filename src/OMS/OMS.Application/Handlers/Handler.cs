@@ -1,4 +1,5 @@
-﻿using OMS.Application.Interfaces.Persistation;
+﻿using OMS.Application.Extensions;
+using OMS.Application.Interfaces.Persistation;
 using OMS.Application.Models;
 using OMS.Common;
 using OMS.Common.Abstractions.Entity;
@@ -6,15 +7,17 @@ using OMS.Common.Interfaces;
 using OMS.Common.Interfaces.Communication;
 using OMS.Common.Interfaces.Communication.Handlers.Event;
 using OMS.Common.Interfaces.Communication.Handlers.Request;
+using OMS.Domain.Connectors;
+using OMS.Domain.Interfaces.Connectors;
 using OMS.Domain.Interfaces.Events;
 
 namespace OMS.Application.Handlers
 {
-    internal class WriteHandler<TEntity>(IMediator mediator, IDbContext context)
+    internal abstract class Handler<TEntity>(IMediator mediator, IDbContext context)
         : IRequestHandler<ICreationDomainEvent<TEntity>, ServiceResponse<TEntity>>,
         IRequestHandler<IModificationDomainEvent<TEntity>, ServiceResponse<TEntity>>,
         IEventHandler<IDeletionDomainEvent<TEntity>>
-        where TEntity : Entity, new()
+        where TEntity : Entity
     {
         protected readonly IMediator Mediator = mediator;
         protected readonly IDbContext Context = context;
@@ -22,16 +25,23 @@ namespace OMS.Application.Handlers
         {
             var entity = await Context.AddAsync(request.Entity, cancellationToken);
 
-            var connectorTasks = request.Connectors?.Select(connector =>
-            {
-                connector.AssignSourceId(entity.Id);
-                // map to domain event
-                // Call Mediator extensions - eg.: Mediator.RequestAsnyc(domainEvent)
-                Mediator.RequestAsync<ICreationDomainEvent<TEntity>, ServiceResponse<TEntity>>(null!, cancellationToken);
-                return Context.AddAsync(connector, cancellationToken);
-            });
+            IConnector[]? connectors = default;
 
-            var connectors = await Task.WhenAll(connectorTasks ?? []);
+            if (request.Connectors is { Length: not 0 })
+            {
+                var connectorTasks = request.Connectors.Select(connector =>
+                {
+                    connector.AssignSourceId(entity.Id);
+                    return Mediator.RequestAsync(connector.ToCreationDomainEvent(), cancellationToken);
+                }) ?? [];
+
+                var results = await Task.WhenAll(connectorTasks);
+
+                connectors = [.. 
+                    results.Where(result => result.Succeeded && result.Value.Connectors is { Length: not 0 })
+                        .SelectMany(result => result.Value!.Connectors!)
+                    ];
+            }
 
             await Context.SaveChangesAsync(cancellationToken);
 
@@ -44,10 +54,7 @@ namespace OMS.Application.Handlers
 
             if(@event.Connectors is { Length: not 0 })
             {
-                foreach (var connector in @event.Connectors)
-                {
-                    Context.Remove(connector);
-                }
+                await Task.WhenAll(@event.Connectors.Select(connector => Mediator.EmitAsync(connector.ToCreationDomainEvent())));
             }
 
             await Context.SaveChangesAsync(cancellationToken);
@@ -59,11 +66,23 @@ namespace OMS.Application.Handlers
         {
             var entity = Context.Update(request.Entity);
 
-            var connectors = request.Connectors?.Select(connector =>
+            IConnector[]? connectors = null;
+
+            if (request.Connectors is { Length: not 0 })
             {
-                connector.AssignSourceId(entity.Id);
-                return Context.Update(connector);
-            }).ToArray() ?? [];
+                var connectorTasks = request.Connectors.Select(connector =>
+                {
+                    connector.AssignSourceId(entity.Id);
+                    return Mediator.RequestAsync(connector.ToModificationDomainEvent(), cancellationToken);
+                }) ?? [];
+
+                var results = await Task.WhenAll(connectorTasks);
+
+                connectors = [..
+                    results.Where(result => result.Succeeded && result.Value.Connectors is { Length: not 0 })
+                    .SelectMany(result => result.Value!.Connectors!)
+                    ];
+            }
 
             await Context.SaveChangesAsync(cancellationToken);
 

@@ -5,5 +5,5 @@ using OMS.Domain.Modules.OrderModule;
 
 namespace OMS.Application.Modules.OrderModule.Handlers
 {
-    internal sealed class OrderRequestHandler(IMediator mediator, IDbContext context) : WriteHandler<Order>(mediator, context);
+    internal sealed class OrderRequestHandler(IMediator mediator, IDbContext context) : Handler<Order>(mediator, context);
 }

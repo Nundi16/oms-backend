@@ -5,10 +5,5 @@ using OMS.Domain.Connectors.OrderClinicConnector;
 
 namespace OMS.Application.Connectors.OrderClinicConnector.Handlers
 {
-    internal sealed class OrderClinicRequestHandler(
-        IMediator mediator,
-        IDbContext context)
-        : BaseHandler<OrderClinic>(mediator, context);
-
-        
+    internal sealed class OrderClinicRequestHandler(IMediator mediator,IDbContext context) : Handler<OrderClinic>(mediator, context);
 }
