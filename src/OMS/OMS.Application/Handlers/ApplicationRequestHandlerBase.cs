@@ -1,5 +1,4 @@
-﻿using OMS.Application.Connectors;
-using OMS.Application.Interfaces.Persistation;
+﻿using OMS.Application.Interfaces.Persistation;
 using OMS.Application.Models;
 using OMS.Common.Abstractions.Entity;
 using OMS.Common.Interfaces;
@@ -10,17 +9,15 @@ namespace OMS.Application.Handlers
 {
     internal abstract class ApplicationRequestHandlerBase<TEntity>(
         IMediator mediator,
-        IRepository<TEntity> repository,
-        IUnitOfWork unitOfWork,
-        IConnectorEventDispatcher connectorEventDispatcher)
-        : RequestHandlerBase<TEntity>(mediator, repository, connectorEventDispatcher)
+        IDbContext context)
+        : BaseHandler<TEntity>(mediator, context)
         where TEntity : Entity, new()
     {
         public override async Task<IResult<ServiceResponse<TEntity>>> HandleAsync(IDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
         {
             var result = await base.HandleAsync(request, cancellationToken);
 
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await Context.SaveChangesAsync(cancellationToken);
 
             return result;
         }

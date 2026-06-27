@@ -1,4 +1,5 @@
-﻿using OMS.Common.Interfaces.Communication.Authorization.Guards;
+﻿using OMS.Common.Interfaces;
+using OMS.Common.Interfaces.Communication.Authorization.Guards;
 using OMS.Common.Interfaces.Communication.Handlers.Event;
 
 namespace OMS.Common.Abstractions.Communication.Handlers.Event
@@ -9,6 +10,6 @@ namespace OMS.Common.Abstractions.Communication.Handlers.Event
         where TEvent : class
         where TAuthorizationGuard : IAuthorizationGuard
     {
-        public abstract Task HandleAsync(TEvent @event, CancellationToken cancellationToken = default);
+        public abstract Task<IResult> HandleAsync(TEvent @event, CancellationToken cancellationToken = default);
     }
 }

@@ -5,7 +5,7 @@ namespace OMS.Infrastructure.Authorization
 {
     internal sealed class UserContext : IUserContext
     {
-        public Guid Id => throw new NotImplementedException();
-        public ClaimsPrincipal Claims => throw new NotImplementedException();
+        public Guid Id => Guid.NewGuid();
+        public ClaimsPrincipal Claims => new();
     }
 }

@@ -15,9 +15,9 @@ namespace OMS.Common
             ErrorMessage = errorMessage;
         }
 
-        public static Result Success() => new(true);
+        public static IResult Success() => new Result(true);
         public static IResult<TValue> Success<TValue>(TValue value) where TValue : notnull => Result<TValue>.Success(value);
-        public static Result Failure(string message) => new(false, message);
+        public static IResult Failure(string message) => new Result(false, message);
         public static IResult<TValue> Failure<TValue>(string message) where TValue : notnull => Result<TValue>.Failure(message);
     }
 

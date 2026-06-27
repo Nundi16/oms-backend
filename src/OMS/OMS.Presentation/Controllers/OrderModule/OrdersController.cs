@@ -9,8 +9,6 @@ namespace OMS.Presentation.Controllers.OrderModule
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = Roles.Order)]
-    public sealed class OrdersController(IMediator mediator) : CrudControllerBase<Order, ServiceResponse<Order>>(mediator)
-    {
-    }
+    //[Authorize(Roles = Roles.Order)]
+    public sealed class OrdersController(IMediator mediator) : CrudControllerBase<Order, ServiceResponse<Order>>(mediator);
 }

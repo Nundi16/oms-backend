@@ -9,7 +9,7 @@ namespace OMS.Infrastructure.Options
         internal bool IsConfigurationCompleted { get; private set; }
         internal IReadOnlyCollection<EntityState> RegisteredStates => _actionsByState.Keys;
         internal TAction GetAction(EntityState entityState) => _actionsByState[entityState];
-
+        
         internal EntityStateActionOptions<TAction> RegisterAction(EntityState state, TAction action)
         {
             ArgumentNullException.ThrowIfNull(action);

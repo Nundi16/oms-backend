@@ -9,7 +9,6 @@ namespace OMS.Application
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.RegisterHandlersFromCurrentAssembly();
-            services.RegisterConnectorDispatch();
 
             return services;
         }
