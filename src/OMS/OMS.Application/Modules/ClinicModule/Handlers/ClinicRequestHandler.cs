@@ -8,8 +8,6 @@ namespace OMS.Application.Modules.ClinicModule.Handlers
 {
     internal sealed class ClinicRequestHandler(
         IMediator mediator,
-        IRepository<Clinic> repository,
-        IUnitOfWork unitOfWork,
-        IConnectorEventDispatcher connectorEventDispatcher)
-        : ApplicationRequestHandlerBase<Clinic>(mediator, repository, unitOfWork, connectorEventDispatcher);
+        IDbContext context)
+        : WriteHandler<Clinic>(mediator, context);
 }

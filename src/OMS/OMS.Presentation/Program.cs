@@ -1,6 +1,6 @@
 using OMS.Application;
 using OMS.Application.Connectors;
-using OMS.Domain.Interfaces.Connectors;
+using OMS.Common.Interfaces.Connectors;
 using OMS.Infrastructure;
 using OMS.Presentation;
 using OMS.Presentation.Extensions;

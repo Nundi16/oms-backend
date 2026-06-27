@@ -22,6 +22,7 @@ namespace OMS.Presentation.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync(CancellationToken cancellationToken = default)
         {
+            
             return Ok();
         }
 
@@ -29,7 +30,7 @@ namespace OMS.Presentation.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> CreateAsync(CreationDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
         {
-            var result = await Mediator.RequestAsync<IDomainEvent<TEntity>, TResponse>(request, cancellationToken);
+            var result = await Mediator.RequestAsync<ICreationDomainEvent<TEntity>, TResponse>(request, cancellationToken);
             return Ok();
         }
 

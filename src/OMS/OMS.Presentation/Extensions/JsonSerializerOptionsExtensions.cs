@@ -37,7 +37,7 @@ namespace OMS.Presentation.Extensions
         private static TypeInfo[] GetDescendantsFromAssebmly(Type type)
         {
             return [..
-                type.Assembly.DefinedTypes.Where(descendantType =>
+                    AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.DefinedTypes).Where(descendantType =>
                     descendantType != type &&
                     !descendantType.IsAbstract &&
                     !descendantType.IsInterface &&

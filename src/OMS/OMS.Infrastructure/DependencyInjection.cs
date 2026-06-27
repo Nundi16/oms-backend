@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using OMS.Application.Interfaces.Persistation;
 using OMS.Common.Communication;
 using OMS.Common.Interfaces;
@@ -11,7 +10,6 @@ using OMS.Infrastructure.Authorization;
 using OMS.Infrastructure.Filters.Helpers;
 using OMS.Infrastructure.Interceptors;
 using OMS.Infrastructure.Options;
-using OMS.Infrastructure.Persistence;
 using static OMS.Common.Constants.Infrastructure;
 
 namespace OMS.Infrastructure
@@ -28,27 +26,18 @@ namespace OMS.Infrastructure
             services.RegisterHandlersFromCurrentAssembly();
 
             services.AddMediator();
-            services.AddPersistence();
-
-            return services;
-        }
-
-        private static IServiceCollection AddPersistence(this IServiceCollection services)
-        {
-            services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-            services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
             return services;
         }
 
         private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<ISaveChangesInterceptor, AuditSaveChangesInterceptor>();
+            services.AddScoped<IInterceptor, AuditSaveChangesInterceptor>();
             services.AddDbContext<IDbContext, ApplicationDbContext>((provider, options) =>
             {
                 options.UseNpgsql(configuration.GetConnectionString(DEFAULT_CONNECTION));
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-                options.AddInterceptors(provider.GetServices<AuditSaveChangesInterceptor>());
+                options.AddInterceptors(provider.GetServices<IInterceptor>());
             });
 
             return services;

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OMS.Common.Interfaces.Communication;
 
@@ -9,6 +10,7 @@ namespace OMS.Presentation.Controllers
     public sealed class FiltersController(IMediator mediator) : ControllerBase
     {
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAsync(CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
