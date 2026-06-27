@@ -12,5 +12,7 @@ namespace OMS.Common.Interfaces.Connectors
 
         void AssignSourceId(Guid sourceId);
         Task<IResult> DispatchCreationAsync(IMediator m, CancellationToken ct = default);
+        Task<IResult> DispatchModificationAsync(IMediator m, CancellationToken ct = default);
+        Task<IResult> DispatchDeletionAsync(IMediator m, CancellationToken ct = default);
     }
 }

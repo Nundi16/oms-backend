@@ -65,7 +65,7 @@ namespace OMS.Application.Handlers
             var processedConnectors = await Task.WhenAll(connectorTasks);
             var connectors = processedConnectors.Where(connector => connector is not null).OfType<IConnector>().ToArray();
 
-            return Result.Success(new ServiceResponse<TEntity>(entity, connectors));
+            return Result.Success(new ServiceResponse<TEntity>(entity, connectors, []));
         }
     }
 }

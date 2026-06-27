@@ -11,5 +11,7 @@ namespace OMS.Common.Interfaces.Extensions
 
         void AssignSourceId(Guid sourceId);
         Task<IResult> DispatchCreationAsync(IMediator m, CancellationToken ct = default);
+        Task<IResult> DispatchModificationAsync(IMediator m, CancellationToken ct = default);
+        Task<IResult> DispatchDeletionAsync(IMediator m, CancellationToken ct = default);
     }
 }

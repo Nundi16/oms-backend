@@ -4,7 +4,7 @@ using OMS.Domain.Interfaces.Events;
 
 namespace OMS.Domain.Abstractions.Events
 {
-    public record DeletionDomainEvent<TEntity>(TEntity Entity, IConnector[] Connectors)
+    public record DeletionDomainEvent<TEntity>(TEntity Entity, IConnector[]? Connectors, bool PersistChanges = true)
         : DomainEvent<TEntity>(Entity, Connectors),
         IDeletionDomainEvent<TEntity>
         where TEntity : IEntity<Guid>;

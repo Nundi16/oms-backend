@@ -31,5 +31,18 @@ namespace OMS.Domain.Extensions
                 ? Result.Success()
                 : Result.Failure(response.ErrorMessage ?? "Extension creation failed.");
         }
+
+        public async Task<IResult> DispatchModificationAsync(IMediator m, CancellationToken ct = default)
+        {
+            var response = await m.RequestAsync<IModificationDomainEvent<TSelf>, ServiceResponse<TSelf>>(
+                new ModificationDomainEvent<TSelf>((TSelf)(object)this, Connectors: null, PersistChanges: false) { Extensions = ChildExtensions }, ct);
+
+            return response.Succeeded
+                ? Result.Success()
+                : Result.Failure(response.ErrorMessage ?? "Extension modification failed.");
+        }
+
+        public Task<IResult> DispatchDeletionAsync(IMediator m, CancellationToken ct = default) =>
+            m.EmitAsync<IDeletionDomainEvent<TSelf>>(new DeletionDomainEvent<TSelf>((TSelf)(object)this, Connectors: null, PersistChanges: false) { Extensions = ChildExtensions }, ct);
     }
 }

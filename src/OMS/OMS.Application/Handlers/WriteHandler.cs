@@ -6,7 +6,9 @@ using OMS.Common.Interfaces;
 using OMS.Common.Interfaces.Communication;
 using OMS.Common.Interfaces.Communication.Handlers.Event;
 using OMS.Common.Interfaces.Communication.Handlers.Request;
+using OMS.Common.Interfaces.Connectors;
 using OMS.Common.Interfaces.Entity;
+using OMS.Common.Interfaces.Extensions;
 using OMS.Domain.Abstractions.Events;
 using OMS.Domain.Interfaces.Events;
 
@@ -49,47 +51,77 @@ namespace OMS.Application.Handlers
                 await Context.SaveChangesAsync(cancellationToken);
             }
 
-            return Result.Success(new ServiceResponse<TEntity>(entity, [])); //TODO: connectors
+            return Result.Success(new ServiceResponse<TEntity>(entity, [], [])); //TODO: connectors
         }
 
         public async Task<IResult> HandleAsync(IDeletionDomainEvent<TEntity> @event, CancellationToken cancellationToken = default)
         {
             Context.Remove(@event.Entity);
 
-            if(@event.Connectors is { Length: not 0 })
-            {
-                foreach (var connector in @event.Connectors)
-                {
-                    Context.Remove(connector);
-                }
-            }
+            var connectorTasks = @event.Connectors?.Select(connector =>
+                connector.DispatchDeletionAsync(Mediator, cancellationToken));
 
-            if (@event.Extensions is { Length: not 0 })
-            {
-                foreach (var extension in @event.Extensions)
-                {
-                    Context.Remove(extension);
-                }
-            }
+            await Task.WhenAll(connectorTasks ?? []);
 
-            await Context.SaveChangesAsync(cancellationToken);
+            var extensionTasks = @event.Extensions?.Select(extension =>
+                extension.DispatchDeletionAsync(Mediator, cancellationToken));
+
+            await Task.WhenAll(extensionTasks ?? []);
+
+            if (@event.PersistChanges)
+            {
+                await Context.SaveChangesAsync(cancellationToken);
+            }
 
             return Result.Success();
         }
 
         public async Task<IResult<ServiceResponse<TEntity>>> HandleAsync(IModificationDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
         {
-            var entity = Context.Update(request.Entity);
+            TEntity entity;
 
-            var connectors = request.Connectors?.Select(connector =>
+            // Connectors and extensions follow upsert/PATCH semantics by design; the root aggregate must already exist.
+            if (request.Entity is IConnector or IExtension)
+            {
+                entity = Context.Update(request.Entity);
+            }
+            else
+            {
+                var tracked = await Context.FindAsync<TEntity>(request.Entity.Id, cancellationToken);
+
+                if (tracked is null)
+                {
+                    return Result.Failure<ServiceResponse<TEntity>>($"{typeof(TEntity).Name} with id '{request.Entity.Id}' was not found.");
+                }
+
+                Context.SetValues(tracked, request.Entity);
+                entity = tracked;
+            }
+
+            var connectorTasks = request.Connectors?.Select(connector =>
             {
                 connector.AssignSourceId(entity.Id);
-                return Context.Update(connector);
-            }).ToArray() ?? [];
 
-            await Context.SaveChangesAsync(cancellationToken);
+                return connector.DispatchModificationAsync(Mediator, cancellationToken);
+            });
 
-            return Result.Success(new ServiceResponse<TEntity>(entity, connectors));
+            var connectors = await Task.WhenAll(connectorTasks ?? []);
+
+            var extensionTasks = request.Extensions?.Select(extension =>
+            {
+                extension.AssignSourceId(entity.Id);
+
+                return extension.DispatchModificationAsync(Mediator, cancellationToken);
+            });
+
+            var extensions = await Task.WhenAll(extensionTasks ?? []);
+
+            if (request.PersistChanges)
+            {
+                await Context.SaveChangesAsync(cancellationToken);
+            }
+
+            return Result.Success(new ServiceResponse<TEntity>(entity, [], [])); //TODO: connectors, extensions
         }
     }
 }
