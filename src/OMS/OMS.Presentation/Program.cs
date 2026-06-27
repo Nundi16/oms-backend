@@ -1,6 +1,7 @@
 using OMS.Application;
 using OMS.Application.Connectors;
 using OMS.Common.Interfaces.Connectors;
+using OMS.Common.Interfaces.Extensions;
 using OMS.Infrastructure;
 using OMS.Presentation;
 using OMS.Presentation.Extensions;
@@ -30,6 +31,7 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.WithPolymorhicModifiersOf<IConnector>();
+    options.JsonSerializerOptions.WithPolymorhicModifiersOf<IExtension>();
 });
 
 builder.Services.AddOpenApi();

@@ -1,6 +1,7 @@
 ﻿using OMS.Common.Interfaces.Entity;
 using OMS.Domain.Connectors;
 using OMS.Common.Interfaces.Connectors;
+using OMS.Common.Interfaces.Extensions;
 
 namespace OMS.Domain.Interfaces.Events
 {
@@ -8,5 +9,6 @@ namespace OMS.Domain.Interfaces.Events
     {
         TEntity Entity { get; }
         IConnector[]?Connectors { get; }  
+        IExtension[]? Extensions { get; }
     }
 }

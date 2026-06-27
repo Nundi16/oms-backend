@@ -35,6 +35,15 @@ namespace OMS.Application.Handlers
 
             var connectors = await Task.WhenAll(connectorTasks ?? []);
 
+            var extensionTasks = request.Extensions?.Select(extension =>
+            {
+                extension.AssignSourceId(entity.Id);
+
+                return extension.DispatchCreationAsync(Mediator, cancellationToken);
+            });
+
+            var extensions = await Task.WhenAll(extensionTasks ?? []);
+
             if (request.PersistChanges)
             {
                 await Context.SaveChangesAsync(cancellationToken);
@@ -52,6 +61,14 @@ namespace OMS.Application.Handlers
                 foreach (var connector in @event.Connectors)
                 {
                     Context.Remove(connector);
+                }
+            }
+
+            if (@event.Extensions is { Length: not 0 })
+            {
+                foreach (var extension in @event.Extensions)
+                {
+                    Context.Remove(extension);
                 }
             }
 
