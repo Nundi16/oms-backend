@@ -4,12 +4,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OMS.Application.Interfaces.Persistation;
 using OMS.Application.Modules.OrderModule;
+using OMS.Application.Modules.OrderModule.Authorization;
 using OMS.Common.Communication;
 using OMS.Common.Interfaces;
 using OMS.Infrastructure.Audit;
 using OMS.Infrastructure.Authorization;
 using OMS.Infrastructure.Filters.Helpers;
 using OMS.Infrastructure.Interceptors;
+using OMS.Infrastructure.Modules.OrderModule.Authorization;
 using OMS.Infrastructure.Options;
 using static OMS.Common.Constants.Infrastructure;
 
@@ -79,6 +81,7 @@ namespace OMS.Infrastructure
 
         private static IServiceCollection AddInternalAuthorization(this IServiceCollection services)
         {
+            services.AddHttpContextAccessor();
             services.AddScoped<IUserContext, UserContext>();
 
             return services;

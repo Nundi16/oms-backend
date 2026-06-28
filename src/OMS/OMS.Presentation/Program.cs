@@ -2,6 +2,7 @@ using OMS.Application;
 using OMS.Common.Interfaces.Entity;
 using OMS.Infrastructure;
 using OMS.Presentation;
+using OMS.Presentation.Auth;
 using OMS.Presentation.Extensions;
 using OMS.Presentation.Middleware;
 using Scalar.AspNetCore;
@@ -27,11 +28,13 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    //options.JsonSerializerOptions.WithPolymorhicModifiersOf<IConnectorEntity>();
     options.JsonSerializerOptions.WithPolymorhicModifiersOf<IConnectorEntity>();
 });
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+});
 
 var app = builder.Build();
 
@@ -42,6 +45,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseHealthChecks("/health");
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
 app.UseRequestTimeouts();
