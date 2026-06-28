@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OMS.Application.Interfaces.Persistation;
+using OMS.Application.Modules.OrderModule;
 using OMS.Common.Communication;
 using OMS.Common.Interfaces;
 using OMS.Infrastructure.Audit;
@@ -27,18 +28,23 @@ namespace OMS.Infrastructure
 
             services.AddMediator();
 
+            services.AddScoped<IOrderAuthorizationGuard, OrderAuthorizationGuard>();
+
             return services;
         }
 
         private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IInterceptor, AuditSaveChangesInterceptor>();
-            services.AddDbContext<IDbContext, ApplicationDbContext>((provider, options) =>
+            services.AddDbContext<ApplicationDbContext>((provider, options) =>
             {
-                options.UseNpgsql(configuration.GetConnectionString(DEFAULT_CONNECTION));
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
                 options.AddInterceptors(provider.GetServices<IInterceptor>());
             });
+
+            services.AddScoped<IDbContext>(provider =>
+    provider.GetRequiredService<ApplicationDbContext>());
 
             return services;
         }
@@ -55,7 +61,7 @@ namespace OMS.Infrastructure
 
             var filterOptions = Microsoft.Extensions.Options.Options.Create(new FilterOptions
             {
-                All = FilterOptionsHelper.GetFilterOptionsFromCurrentAssembly()
+                Filters = FilterOptionsHelper.GetFilterOptionsFromCurrentAssembly()
             });
 
             services.AddSingleton(filterOptions);

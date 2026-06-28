@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using OMS.Common.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using OMS.Application.Models;
 using OMS.Common.Interfaces.Communication;
-using OMS.Domain;
 using OMS.Domain.Modules.OrderModule;
 
 namespace OMS.Presentation.Controllers.OrderModule

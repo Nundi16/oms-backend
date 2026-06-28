@@ -31,7 +31,7 @@ namespace OMS.Presentation.Controllers
         public async Task<IActionResult> CreateAsync(CreationDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
         {
             var result = await Mediator.RequestAsync<ICreationDomainEvent<TEntity>, TResponse>(request, cancellationToken);
-            return Ok();
+            return Ok(result);
         }
 
         [HttpPut]

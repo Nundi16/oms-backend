@@ -1,5 +1,4 @@
-﻿using OMS.Common.Abstractions.Entity;
-using OMS.Common.Interfaces.Entity;
+﻿using OMS.Common.Interfaces.Entity;
 
 namespace OMS.Application.Interfaces.Persistation
 {

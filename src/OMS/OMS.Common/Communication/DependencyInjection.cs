@@ -20,18 +20,27 @@ namespace OMS.Common.Communication
             return services;
         }
 
+        public static IServiceCollection RegisterAuthorizationGuardsFromCurrentAssembly(this IServiceCollection services)
+        {
+            var assembly = Assembly.GetCallingAssembly() ?? throw new InvalidOperationException("Calling assembly not found.");
+
+            var guards = assembly.DefinedTypes.Where(type => type is { IsAbstract: false, IsInterface: false, ContainsGenericParameters: false } && typeof(IAuthorizationGuard).IsAssignableFrom(type));
+
+            // TODO: register auth guard by the highest interface that implements IAuthorizationGuard
+            //var descriptors = guards.Select(guard => new ServiceDescriptor(guard.GetInterfaces()., guard, ServiceLifetime.Scoped));
+
+            return services;
+        }
+
         public static IServiceCollection RegisterHandlersFromCurrentAssembly(this IServiceCollection services)
         {
-            var assembly = Assembly.GetCallingAssembly();
+            var assembly = Assembly.GetCallingAssembly() ?? throw new InvalidOperationException("Calling assembly not found.");
 
-            if (assembly is not null)
-            {
-                var handlerTypes = GetHandlerImplementationTypesFromAssembly(assembly);
+            var handlerTypes = GetHandlerImplementationTypesFromAssembly(assembly);
 
-                var descriptors = CreateServiceDescriptors(handlerTypes);
+            var descriptors = CreateServiceDescriptors(handlerTypes);
 
-                services.Add(descriptors);
-            }
+            services.Add(descriptors);
 
             return services;
         }

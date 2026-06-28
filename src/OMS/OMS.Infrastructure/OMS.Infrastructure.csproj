@@ -15,16 +15,12 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\OMS.Application\OMS.Application.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Modules\ClinicModule\Handlers\" />
-    <Folder Include="Modules\OrderModule\Handlers\" />
   </ItemGroup>
 
 </Project>

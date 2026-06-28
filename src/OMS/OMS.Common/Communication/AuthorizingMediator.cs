@@ -12,24 +12,15 @@ namespace OMS.Common.Communication
         protected readonly IServiceProvider ServiceProvider = serviceProvider;
         protected readonly IMediatorAuthorizationGuard AuthorizationGuard = authorizationGuard;
 
-/*         public Task EmitAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
-        {
-            var handler = ServiceProvider.GetRequiredService<IEventHandler<TEvent>>();
-
-            return AuthorizationGuard.Authorize(handler).Succeeded
-                ? handler.HandleAsync(@event, cancellationToken)
-                : Task.CompletedTask;
-        }
-
         public Task FanOutAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
         {
             var handlers = ServiceProvider.GetServices<IEventHandler<TEvent>>()
                 .Where(handler => AuthorizationGuard.Authorize(handler).Succeeded);
 
-            var tasks = handlers.Select(handler => handler.HandleAsync(@event, cancellationToken)).ToArray();
+            var tasks = handlers.Select(handler => handler.HandleAsync(@event, cancellationToken));
 
             return Task.WhenAll(tasks);
-        } */
+        }
 
         public Task<IResult> EmitAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
         {
@@ -44,13 +35,11 @@ namespace OMS.Common.Communication
             where TRequest : class
             where TResponse : class
         {
-            
-                var handler = ServiceProvider.GetRequiredService<IRequestHandler<TRequest, TResponse>>();
+            var handler = ServiceProvider.GetRequiredService<IRequestHandler<TRequest, TResponse>>();
 
-                return AuthorizationGuard.Authorize(handler).Succeeded
-                    ?  handler.HandleAsync(request, cancellationToken)
-                    :  Task.FromResult(Result.Failure<TResponse>(""));
-            
+            return AuthorizationGuard.Authorize(handler).Succeeded
+                ? handler.HandleAsync(request, cancellationToken)
+                : Task.FromResult(Result.Failure<TResponse>(""));
         }
     }
 }

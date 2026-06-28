@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using OMS.Common.Interfaces.Entity;
 
 namespace OMS.Presentation.Extensions
 {
@@ -24,7 +25,7 @@ namespace OMS.Presentation.Extensions
             {
                 typeInfo.PolymorphismOptions = new()
                 {
-                    TypeDiscriminatorPropertyName = "TypeDescriptor"
+                    TypeDiscriminatorPropertyName = nameof(IConnectorEntity.TypeDescriptor)
                 };
 
                 foreach (var type in derivedTypes)
