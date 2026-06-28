@@ -1,6 +1,5 @@
 using OMS.Application;
-using OMS.Application.Connectors;
-using OMS.Domain.Interfaces.Connectors;
+using OMS.Common.Interfaces.Entity;
 using OMS.Infrastructure;
 using OMS.Presentation;
 using OMS.Presentation.Extensions;
@@ -9,7 +8,6 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPresentation();
@@ -29,14 +27,13 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.WithPolymorhicModifiersOf<IConnector>();
+    options.JsonSerializerOptions.WithPolymorhicModifiersOf<IConnectorEntity>();
 });
 
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

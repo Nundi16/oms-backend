@@ -4,7 +4,7 @@ namespace OMS.Infrastructure.Options
 {
     public sealed class FilterOptions
     {
-        public required FilterOption[] All { get; init; }
+        public required FilterOption[] Filters { get; init; }
     }
 
     public sealed record FilterOption

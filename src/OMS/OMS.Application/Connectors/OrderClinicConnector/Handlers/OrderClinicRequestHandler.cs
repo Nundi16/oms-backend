@@ -1,7 +1,7 @@
 using OMS.Application.Handlers;
 using OMS.Application.Interfaces.Persistation;
 using OMS.Common.Interfaces.Communication;
-using OMS.Domain.Connectors.OrderClinicConnector;
+using OMS.Domain.Modules.OrderClinicConnector;
 
 namespace OMS.Application.Connectors.OrderClinicConnector.Handlers
 {

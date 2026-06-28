@@ -1,12 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OMS.Application.Interfaces.Persistation;
-using OMS.Common.Abstractions.Entity;
 using OMS.Common.Interfaces.Entity;
 using OMS.Infrastructure.Abstractions.Configuration;
 
 namespace OMS.Infrastructure
 {
-    internal sealed class ApplicationDbContext(DbContextOptions options) : DbContext(options), IDbContext
+    internal sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IDbContext
     {
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

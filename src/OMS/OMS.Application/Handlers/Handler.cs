@@ -7,8 +7,7 @@ using OMS.Common.Interfaces;
 using OMS.Common.Interfaces.Communication;
 using OMS.Common.Interfaces.Communication.Handlers.Event;
 using OMS.Common.Interfaces.Communication.Handlers.Request;
-using OMS.Domain.Connectors;
-using OMS.Domain.Interfaces.Connectors;
+using OMS.Common.Interfaces.Entity;
 using OMS.Domain.Interfaces.Events;
 
 namespace OMS.Application.Handlers
@@ -25,14 +24,14 @@ namespace OMS.Application.Handlers
         {
             var entity = await Context.AddAsync(request.Entity, cancellationToken);
 
-            IConnector[]? connectors = default;
+            IConnectorEntity[]? connectors = default;
 
             if (request.Connectors is { Length: not 0 })
             {
                 var connectorTasks = request.Connectors.Select(connector =>
                 {
                     connector.AssignSourceId(entity.Id);
-                    return Mediator.RequestAsync(connector.ToCreationDomainEvent(), cancellationToken);
+                    return Mediator.RequestAsync(connector.ToCreationDomainEvent(connector.Connectors), cancellationToken);
                 }) ?? [];
 
                 var results = await Task.WhenAll(connectorTasks);
@@ -66,14 +65,14 @@ namespace OMS.Application.Handlers
         {
             var entity = Context.Update(request.Entity);
 
-            IConnector[]? connectors = null;
+            IConnectorEntity[]? connectors = null;
 
             if (request.Connectors is { Length: not 0 })
             {
                 var connectorTasks = request.Connectors.Select(connector =>
                 {
                     connector.AssignSourceId(entity.Id);
-                    return Mediator.RequestAsync(connector.ToModificationDomainEvent(), cancellationToken);
+                    return Mediator.RequestAsync(connector.ToModificationDomainEvent(connector.Connectors), cancellationToken);
                 }) ?? [];
 
                 var results = await Task.WhenAll(connectorTasks);

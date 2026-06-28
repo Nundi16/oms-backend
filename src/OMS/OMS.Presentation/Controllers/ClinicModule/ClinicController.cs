@@ -9,8 +9,6 @@ namespace OMS.Presentation.Controllers.ClinicModule
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = Roles.Clinic)]
-    public sealed class ClinicController(IMediator mediator) : CrudControllerBase<Clinic, ServiceResponse<Clinic>>(mediator)
-    {
-    }
+    //[Authorize(Roles = Roles.Clinic)]
+    public sealed class ClinicController(IMediator mediator) : CrudControllerBase<Clinic, ServiceResponse<Clinic>>(mediator);
 }

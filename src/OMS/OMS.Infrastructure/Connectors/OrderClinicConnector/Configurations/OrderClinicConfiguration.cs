@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using OMS.Domain.Connectors.OrderClinicConnector;
+using OMS.Domain.Modules.OrderClinicConnector;
 using OMS.Infrastructure.Abstractions.Configuration;
 
 namespace OMS.Infrastructure.Connectors.OrderClinicConnector.Configurations

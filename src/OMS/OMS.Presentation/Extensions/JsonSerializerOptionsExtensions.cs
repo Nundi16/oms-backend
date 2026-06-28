@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using OMS.Common.Interfaces.Entity;
 
 namespace OMS.Presentation.Extensions
 {
@@ -24,7 +25,7 @@ namespace OMS.Presentation.Extensions
             {
                 typeInfo.PolymorphismOptions = new()
                 {
-                    TypeDiscriminatorPropertyName = "TypeDescriptor"
+                    TypeDiscriminatorPropertyName = nameof(IConnectorEntity.TypeDescriptor)
                 };
 
                 foreach (var type in derivedTypes)
@@ -37,7 +38,7 @@ namespace OMS.Presentation.Extensions
         private static TypeInfo[] GetDescendantsFromAssebmly(Type type)
         {
             return [..
-                type.Assembly.DefinedTypes.Where(descendantType =>
+                    AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.DefinedTypes).Where(descendantType =>
                     descendantType != type &&
                     !descendantType.IsAbstract &&
                     !descendantType.IsInterface &&

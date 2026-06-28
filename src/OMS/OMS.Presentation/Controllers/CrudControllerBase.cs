@@ -22,6 +22,7 @@ namespace OMS.Presentation.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync(CancellationToken cancellationToken = default)
         {
+            
             return Ok();
         }
 
