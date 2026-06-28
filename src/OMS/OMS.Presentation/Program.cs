@@ -7,6 +7,8 @@ using OMS.Presentation.Extensions;
 using OMS.Presentation.Middleware;
 using Scalar.AspNetCore;
 
+const string DevelopmentCorsPolicy = nameof(DevelopmentCorsPolicy);
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddApplication();
@@ -24,6 +26,15 @@ builder.Services.AddProblemDetails();
 builder.Services.AddRateLimiter();
 builder.Services.AddRequestTimeouts();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(DevelopmentCorsPolicy, policy =>
+    {
+        policy.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 //builder.Services.AddResponseCaching();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
@@ -40,6 +51,7 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseCors(DevelopmentCorsPolicy);
     app.MapOpenApi();
 }
 
