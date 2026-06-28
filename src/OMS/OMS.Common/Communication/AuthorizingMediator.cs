@@ -31,6 +31,15 @@ namespace OMS.Common.Communication
             return Task.WhenAll(tasks);
         }
 
+        public Task<IResult> EmitAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
+        {
+            var handler = ServiceProvider.GetRequiredService<IEventHandler<TEvent>>();
+
+            return AuthorizationGuard.Authorize(handler).Succeeded
+                ? handler.HandleAsync(@event, cancellationToken)
+                : Task.FromResult(Result.Failure(""));
+        }
+
         public Task<IResult<TResponse>> RequestAsync<TRequest, TResponse>(TRequest request, CancellationToken cancellationToken = default)
             where TRequest : class
             where TResponse : class

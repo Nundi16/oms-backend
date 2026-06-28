@@ -35,14 +35,16 @@ namespace OMS.Presentation.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateAsync(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> UpdateAsync(ModificationDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
         {
+            var result = await Mediator.RequestAsync<IModificationDomainEvent<TEntity>, TResponse>(request, cancellationToken);
             return Ok();
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteAsync(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> DeleteAsync(DeletionDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
         {
+            var result = await Mediator.EmitAsync<IDeletionDomainEvent<TEntity>>(request, cancellationToken);
             return Ok();
         }
     }
