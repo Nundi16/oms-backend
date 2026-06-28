@@ -1,6 +1,6 @@
 using OMS.Application.Handlers;
 using OMS.Application.Interfaces.Persistation;
-using OMS.Application.Modules.OrderModule;
+using OMS.Application.Modules.OrderModule.Authorization;
 using OMS.Common.Interfaces.Communication;
 using OMS.Domain.Modules.OrderClinicConnector;
 
