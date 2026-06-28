@@ -27,6 +27,7 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
+    //options.JsonSerializerOptions.WithPolymorhicModifiersOf<IConnectorEntity>();
     options.JsonSerializerOptions.WithPolymorhicModifiersOf<IConnectorEntity>();
 });
 

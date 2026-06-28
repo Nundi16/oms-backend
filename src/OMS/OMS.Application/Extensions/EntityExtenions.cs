@@ -5,15 +5,15 @@ namespace OMS.Application.Extensions
 {
     internal static class EntityExtenions
     {
-        internal static CreationDomainEvent<TEntity> ToCreationDomainEvent<TEntity>(this TEntity entity, IConnector<Guid>[]? connectors = null) 
+        internal static CreationDomainEvent<TEntity> ToCreationDomainEvent<TEntity>(this TEntity entity, IConnectorEntity[]? connectors = null) 
             where TEntity : class, IEntity<Guid> =>
             new(entity, connectors);
 
-        internal static ModificationDomainEvent<TEntity> ToModificationDomainEvent<TEntity>(this TEntity entity, IConnector<Guid>[]? connectors = null)
+        internal static ModificationDomainEvent<TEntity> ToModificationDomainEvent<TEntity>(this TEntity entity, IConnectorEntity[]? connectors = null)
             where TEntity : class, IEntity<Guid> =>
             new(entity, connectors);
 
-        internal static DeletionDomainEvent<TEntity> ToDeletionDomainEvent<TEntity>(this TEntity entity, IConnector<Guid>[]? connectors = null)
+        internal static DeletionDomainEvent<TEntity> ToDeletionDomainEvent<TEntity>(this TEntity entity, IConnectorEntity[]? connectors = null)
             where TEntity : class, IEntity<Guid> =>
             new(entity, connectors);
     }

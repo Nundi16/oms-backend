@@ -3,7 +3,7 @@ using OMS.Domain.Interfaces.Events;
 
 namespace OMS.Domain.Abstractions.Events
 {
-    public record CreationDomainEvent<TEntity>(TEntity Entity, IConnector<Guid>[]? Connectors)
+    public record CreationDomainEvent<TEntity>(TEntity Entity, IConnectorEntity[]? Connectors)
         : DomainEvent<TEntity>(Entity, Connectors),
         ICreationDomainEvent<TEntity>
         where TEntity : IEntity<Guid>;

@@ -16,7 +16,7 @@ namespace OMS.Common.Abstractions.Entity
         public TDependant? Dependant { get; set; }
 
         [NotMapped]
-        public IConnector<Guid>[]? Connectors { get; set; }
+        public IConnectorEntity[]? Connectors { get; set; }
 
         public void AssignSourceId(Guid sourceId)
         {

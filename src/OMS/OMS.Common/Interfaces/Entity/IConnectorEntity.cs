@@ -6,10 +6,11 @@
         string TypeDescriptor { get; }
         TKey? SourceId { get; }
         TKey DependantId { get; }
-        IConnector<TKey>[]? Connectors { get; set; }
-
         void AssignSourceId(Guid sourceId);
     }
 
-    public interface IConnectorEntity : IConnector<Guid>;
+    public interface IConnectorEntity : IConnector<Guid>
+    {
+        IConnectorEntity[]? Connectors { get; set; }
+    }
 }

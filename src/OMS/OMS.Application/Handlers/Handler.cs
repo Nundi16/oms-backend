@@ -69,7 +69,14 @@ namespace OMS.Application.Handlers
 
         public async Task<IResult<ServiceResponse<TEntity>>> HandleAsync(IModificationDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
         {
-            var entity = Context.Update(request.Entity);
+            var trackedEntity = await Context.FindAsync<TEntity>(request.Entity.Id, cancellationToken);
+
+            if (trackedEntity is null and not IConnectorEntity)
+            {
+                return Result.Failure<ServiceResponse<TEntity>>("Entity doesn't exist.");
+            }
+
+            var entity = Context.Update(trackedEntity ?? request.Entity);
 
             IConnectorEntity[]? connectors = null;
 
@@ -77,7 +84,6 @@ namespace OMS.Application.Handlers
             {
                 var connectorTasks = request.Connectors.Select(connector =>
                 {
-                    connector.AssignSourceId(entity.Id);
                     return Mediator.RequestAsync(connector.ToModificationDomainEvent(connector.Connectors), cancellationToken);
                 }) ?? [];
 

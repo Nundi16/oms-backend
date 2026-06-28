@@ -12,15 +12,6 @@ namespace OMS.Common.Communication
         protected readonly IServiceProvider ServiceProvider = serviceProvider;
         protected readonly IMediatorAuthorizationGuard AuthorizationGuard = authorizationGuard;
 
-        public Task EmitAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
-        {
-            var handler = ServiceProvider.GetRequiredService<IEventHandler<TEvent>>();
-
-            return AuthorizationGuard.Authorize(handler).Succeeded
-                ? handler.HandleAsync(@event, cancellationToken)
-                : Task.CompletedTask;
-        }
-
         public Task FanOutAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : class
         {
             var handlers = ServiceProvider.GetServices<IEventHandler<TEvent>>()
