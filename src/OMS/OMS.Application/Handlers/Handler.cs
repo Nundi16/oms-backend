@@ -2,9 +2,11 @@
 using OMS.Application.Interfaces.Persistation;
 using OMS.Application.Models;
 using OMS.Common;
+using OMS.Common.Abstractions.Communication.Handlers;
 using OMS.Common.Abstractions.Entity;
 using OMS.Common.Interfaces;
 using OMS.Common.Interfaces.Communication;
+using OMS.Common.Interfaces.Communication.Authorization.Guards;
 using OMS.Common.Interfaces.Communication.Handlers.Event;
 using OMS.Common.Interfaces.Communication.Handlers.Request;
 using OMS.Common.Interfaces.Entity;
@@ -12,15 +14,18 @@ using OMS.Domain.Interfaces.Events;
 
 namespace OMS.Application.Handlers
 {
-    internal abstract class Handler<TEntity>(IMediator mediator, IDbContext context)
-        : IRequestHandler<ICreationDomainEvent<TEntity>, ServiceResponse<TEntity>>,
+    internal abstract class Handler<TEntity, TAuthorizationGuard>(IMediator mediator, IDbContext context, TAuthorizationGuard guard)
+        : AuthorizedHandler<TAuthorizationGuard>(guard),
+        IRequestHandler<ICreationDomainEvent<TEntity>, ServiceResponse<TEntity>>,
         IRequestHandler<IModificationDomainEvent<TEntity>, ServiceResponse<TEntity>>,
         IEventHandler<IDeletionDomainEvent<TEntity>>
+        where TAuthorizationGuard : IAuthorizationGuard
         where TEntity : Entity
     {
         protected readonly IMediator Mediator = mediator;
         protected readonly IDbContext Context = context;
-        public async Task<IResult<ServiceResponse<TEntity>>> HandleAsync(ICreationDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
+
+        public virtual async Task<IResult<ServiceResponse<TEntity>>> HandleAsync(ICreationDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
         {
             var entity = await Context.AddAsync(request.Entity, cancellationToken);
 
@@ -50,7 +55,7 @@ namespace OMS.Application.Handlers
             return Result.Success(new ServiceResponse<TEntity>(entity, connectors));
         }
 
-        public async Task<IResult> HandleAsync(IDeletionDomainEvent<TEntity> @event, CancellationToken cancellationToken = default)
+        public virtual async Task<IResult> HandleAsync(IDeletionDomainEvent<TEntity> @event, CancellationToken cancellationToken = default)
         {
             Context.Remove(@event.Entity);
 
@@ -67,7 +72,7 @@ namespace OMS.Application.Handlers
             return Result.Success();
         }
 
-        public async Task<IResult<ServiceResponse<TEntity>>> HandleAsync(IModificationDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
+        public virtual async Task<IResult<ServiceResponse<TEntity>>> HandleAsync(IModificationDomainEvent<TEntity> request, CancellationToken cancellationToken = default)
         {
             var trackedEntity = await Context.FindAsync<TEntity>(request.Entity.Id, cancellationToken);
 

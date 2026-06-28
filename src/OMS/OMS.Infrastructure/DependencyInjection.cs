@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OMS.Application.Interfaces.Persistation;
+using OMS.Application.Modules.OrderModule;
 using OMS.Common.Communication;
 using OMS.Common.Interfaces;
 using OMS.Infrastructure.Audit;
@@ -26,6 +27,8 @@ namespace OMS.Infrastructure
             services.RegisterHandlersFromCurrentAssembly();
 
             services.AddMediator();
+
+            services.AddScoped<IOrderAuthorizationGuard, OrderAuthorizationGuard>();
 
             return services;
         }

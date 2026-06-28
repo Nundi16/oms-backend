@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using OMS.Application.Connectors;
 using OMS.Common.Communication;
 
 namespace OMS.Application
