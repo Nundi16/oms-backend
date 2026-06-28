@@ -11,8 +11,5 @@ namespace OMS.Common.Interfaces.Connectors
         IConnector[]? ChildConnectors { get; set; }
 
         void AssignSourceId(Guid sourceId);
-        Task<IResult> DispatchCreationAsync(IMediator m, CancellationToken ct = default);
-        Task<IResult> DispatchModificationAsync(IMediator m, CancellationToken ct = default);
-        Task<IResult> DispatchDeletionAsync(IMediator m, CancellationToken ct = default);
     }
 }

@@ -100,8 +100,6 @@ namespace OMS.Application.Handlers
 
             var connectorTasks = request.Connectors?.Select(connector =>
             {
-                connector.AssignSourceId(entity.Id);
-
                 return connector.DispatchModificationAsync(Mediator, cancellationToken);
             });
 
@@ -109,8 +107,6 @@ namespace OMS.Application.Handlers
 
             var extensionTasks = request.Extensions?.Select(extension =>
             {
-                extension.AssignSourceId(entity.Id);
-
                 return extension.DispatchModificationAsync(Mediator, cancellationToken);
             });
 

@@ -25,28 +25,6 @@ namespace OMS.Domain.Connectors
         public  IConnector[]? ChildConnectors { get; set; }
 
         public void AssignSourceId(Guid sourceId) => SourceId = sourceId;
-        public async Task<IResult> DispatchCreationAsync(IMediator m, CancellationToken ct = default)
-        {
-            var response = await m.RequestAsync<ICreationDomainEvent<TSelf>, ServiceResponse<TSelf>>(
-                new CreationDomainEvent<TSelf>((TSelf)(object)this, ChildConnectors, PersistChanges: false), ct);
-
-            return response.Succeeded
-                ? Result.Success()
-                : Result.Failure(response.ErrorMessage ?? "Connector creation failed.");
-        }
-
-        public async Task<IResult> DispatchModificationAsync(IMediator m, CancellationToken ct = default)
-        {
-            var response = await m.RequestAsync<IModificationDomainEvent<TSelf>, ServiceResponse<TSelf>>(
-                new ModificationDomainEvent<TSelf>((TSelf)(object)this, ChildConnectors, PersistChanges: false), ct);
-
-            return response.Succeeded
-                ? Result.Success()
-                : Result.Failure(response.ErrorMessage ?? "Connector modification failed.");
-        }
-
-        public Task<IResult> DispatchDeletionAsync(IMediator m, CancellationToken ct = default) =>
-            m.EmitAsync<IDeletionDomainEvent<TSelf>>(new DeletionDomainEvent<TSelf>((TSelf)(object)this, ChildConnectors, PersistChanges: false), ct);
     }
 }
 
