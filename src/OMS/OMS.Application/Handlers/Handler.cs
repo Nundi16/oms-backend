@@ -42,7 +42,10 @@ namespace OMS.Application.Handlers
                     ];
             }
 
-            await Context.SaveChangesAsync(cancellationToken);
+            if (request.SaveChanges)
+            {
+                await Context.SaveChangesAsync(cancellationToken);
+            }
 
             return Result.Success(new ServiceResponse<TEntity>(entity, connectors));
         }
@@ -56,7 +59,10 @@ namespace OMS.Application.Handlers
                 await Task.WhenAll(@event.Connectors.Select(connector => Mediator.EmitAsync(connector.ToCreationDomainEvent())));
             }
 
-            await Context.SaveChangesAsync(cancellationToken);
+            if (@event.SaveChanges)
+            {
+                await Context.SaveChangesAsync(cancellationToken);
+            }
 
             return Result.Success();
         }
@@ -83,7 +89,10 @@ namespace OMS.Application.Handlers
                     ];
             }
 
-            await Context.SaveChangesAsync(cancellationToken);
+            if (request.SaveChanges)
+            {
+                await Context.SaveChangesAsync(cancellationToken);
+            }
 
             return Result.Success(new ServiceResponse<TEntity>(entity, connectors));
         }

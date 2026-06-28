@@ -6,5 +6,6 @@ namespace OMS.Domain.Interfaces.Events
     {
         TEntity Entity { get; }
         IConnector<Guid>[]? Connectors { get; }  
+        bool SaveChanges { get; }
     }
 }
