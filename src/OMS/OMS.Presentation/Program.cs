@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using OMS.Application;
 using OMS.Common.Interfaces.Entity;
 using OMS.Infrastructure;
@@ -48,6 +49,18 @@ builder.Services.AddOpenApi(options =>
 });
 
 var app = builder.Build();
+
+// Apply pending migrations automatically on startup
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+
+    if (pendingMigrations.Any())
+    {
+        await dbContext.Database.MigrateAsync();
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {

@@ -5,7 +5,7 @@ using OMS.Infrastructure.Abstractions.Configuration;
 
 namespace OMS.Infrastructure
 {
-    internal sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IDbContext
+    public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IDbContext
     {
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

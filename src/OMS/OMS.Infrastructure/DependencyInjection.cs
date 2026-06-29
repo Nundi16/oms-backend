@@ -35,18 +35,31 @@ namespace OMS.Infrastructure
             return services;
         }
 
+    //    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    //    {
+    //        services.AddScoped<IInterceptor, AuditSaveChangesInterceptor>();
+    //        services.AddDbContext<ApplicationDbContext>((provider, options) =>
+    //        {
+    //            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+    //            options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+    //            options.AddInterceptors(provider.GetServices<IInterceptor>());
+    //        });
+
+    //        services.AddScoped<IDbContext>(provider =>
+    //provider.GetRequiredService<ApplicationDbContext>());
+
+    //        return services;
+    //    }
+
         private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IInterceptor, AuditSaveChangesInterceptor>();
-            services.AddDbContext<ApplicationDbContext>((provider, options) =>
+            services.AddDbContext<IDbContext, ApplicationDbContext>((provider, options) =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                options.UseNpgsql(configuration.GetConnectionString(DEFAULT_CONNECTION));
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
                 options.AddInterceptors(provider.GetServices<IInterceptor>());
             });
-
-            services.AddScoped<IDbContext>(provider =>
-    provider.GetRequiredService<ApplicationDbContext>());
 
             return services;
         }

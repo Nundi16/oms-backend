@@ -27,4 +27,8 @@
     <ProjectReference Include="..\OMS.Application\OMS.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>
